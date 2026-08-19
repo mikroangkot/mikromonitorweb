@@ -1,0 +1,9 @@
+flet
+flet-geolocator
+flet-secure-storage
+pillow
+captcha
+qrcode
+PyJWT
+bcrypt
+python-dotenv
