@@ -69,4 +69,4 @@ class Router:
         self.page.views.clear()
         view = guard.builder(self.page)
         self.page.views.append(view)
-        await self.page.update()
+        self.page.update()
