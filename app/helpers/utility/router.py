@@ -1,7 +1,6 @@
 import flet as ft
-import jwt
-import flet_secure_storage as fss
 from datetime import datetime, timezone
+from app.helpers.dataformatter import DataFormatter
 from typing import Callable, Dict
 
 
@@ -20,9 +19,9 @@ class RouteGuard:
 class Router:
     def __init__(self, page: ft.Page):
         self.page = page
-        self.storage = fss.SecureStorage()
         self.routes: Dict[str, RouteGuard] = {}
         self.page.on_route_change = self._middleware_pipeline
+        self.storage = DataFormatter()
 
     def add_route(
         self,
@@ -37,7 +36,7 @@ class Router:
         if not token:
             return False
         try:
-            payload = jwt.decode(token, options={"verify_signature": False})
+            payload = DataFormatter.decodetoken(token)
             exp = payload.get("exp")
             if not exp:
                 return True
@@ -61,7 +60,7 @@ class Router:
         guard = self.routes[target_route]
 
         if guard.protected and not is_authenticated:
-            return await self.page.push_route("/login")
+            return await self.page.push_route("/signin")
 
         if guard.guest_only and is_authenticated:
             return await self.page.push_route("/home")

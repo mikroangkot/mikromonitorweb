@@ -2,7 +2,7 @@ import flet as ft
 import asyncio
 from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
-from app.helpers.utility import state, config
+from app.helpers.utility import state
 from app.views.auth import offline, loading
 
 
@@ -18,16 +18,16 @@ async def info_server(page: ft.Page):
                 message = list_info.get("message")
                 if not info or not message:
                     continue
-                if info == f"{config.APP_NAME}_register":
+                if info == "project_register":
                     state.register_status = message
                     page.register_status = message
-                if info == f"{config.APP_NAME}_status":
+                if info == "project_status":
                     state.server_status = message
                     page.server_status = message
                     if message == "close":
                         await page.push_route("/503")
                         return None
-                if info == f"{config.APP_NAME}" and message:
+                if info == "project" and message:
 
                     async def close_banner(e):
                         page.pop_dialog()
@@ -59,11 +59,11 @@ async def info_server(page: ft.Page):
             state.on_retry_click = coba_lagi
             page.navigate("/offline")
             await button_click.wait()
-    user_saved = await storage.get_object("current_user")
+    user_saved = await storage.get("current_user")
     if user_saved:
         page.session.store.set("current_user", user_saved)
     if getattr(page, "server_status", "open") != "close":
         initial_route = (
-            "/home" if page.session.store.contains_key("current_user") else "/login"
+            "/home" if page.session.store.contains_key("current_user") else "/signin"
         )
         page.navigate(initial_route)

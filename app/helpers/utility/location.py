@@ -50,7 +50,7 @@ async def get_current_location(page: ft.Page, geo: ftg.Geolocator):
 
         if p:
             lokasi["latlong"] = f"{p.latitude},{p.longitude}"
-            await storage.set_object("current_location", lokasi)
+            await storage.set("current_location", lokasi)
             return lokasi
 
         else:
