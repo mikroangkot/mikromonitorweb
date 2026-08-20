@@ -254,7 +254,7 @@ def signin_view(page: ft.Page):
 
     app_icon = ft.Container(
         content=ft.Image(
-            src="/images/icon.gif", width=165, height=165, fit=ft.BoxFit.CONTAIN, color=ft.Colors.WHITE
+            src="/images/icon.gif", width=200, height=200, fit=ft.BoxFit.CONTAIN, color=ft.Colors.WHITE
         ),
         margin=ft.Margin(bottom=-20)
     )
