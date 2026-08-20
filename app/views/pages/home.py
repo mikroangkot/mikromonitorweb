@@ -119,7 +119,7 @@ def home_view(page: ft.Page):
             src="/images/icon.gif", width=200, height=200, fit=ft.BoxFit.CONTAIN, color=ft.Colors.WHITE
         ),
         alignment=ft.Alignment.CENTER,
-        margin=ft.Margin(bottom=-20)
+        margin=ft.Margin(bottom=-35)
     )
 
     app_name = ft.Container(

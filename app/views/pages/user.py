@@ -49,7 +49,7 @@ def user_view(page: ft.Page):
     user_icon = ft.Container(
         content=ft.CircleAvatar(
             foreground_image_src=f"{config.API_CDN}/images/{user_image}",
-            radius=60,
+            radius=70,
         ),
         alignment=ft.Alignment.CENTER,
     )

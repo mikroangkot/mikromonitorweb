@@ -151,6 +151,7 @@ def signin_view(page: ft.Page):
                 user_payload = DataFormatter.decodetoken(token)
                 username = user_payload.get("nama")
                 storage = DataFormatter()
+                await storage.set("current_user", user_payload)
                 await storage.set("token", token)
 
                 if not page.session.store.contains_key("current_user"):
@@ -256,7 +257,7 @@ def signin_view(page: ft.Page):
         content=ft.Image(
             src="/images/icon.gif", width=200, height=200, fit=ft.BoxFit.CONTAIN, color=ft.Colors.WHITE
         ),
-        margin=ft.Margin(bottom=-20)
+        margin=ft.Margin(bottom=-35)
     )
 
     app_name = ft.Container(

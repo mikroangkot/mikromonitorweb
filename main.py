@@ -100,7 +100,7 @@ async def main(page: ft.Page):
     async def handle_lifecycle_change(e: ft.AppLifecycleStateChangeEvent):
         if e.state == "resumed":
             await location.get_current_location(page, geo)
-            user_saved = await storage.get_object("current_user")
+            user_saved = await storage.get("current_user")
 
             if user_saved and not page.session.store.contains_key("current_user"):
                 page.session.store.set("current_user", user_saved)
