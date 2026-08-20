@@ -38,7 +38,7 @@ def home_view(page: ft.Page):
         try:
             await Api.useractivity(user_name, "Signout")
         except Exception as err:
-            DataFormatter.log_msg("koneksi bermasalah", tag="logout_error")
+            DataFormatter.log_msg("koneksi bermasalah", tag="signout_error")
 
         await storage.remove("token")
         page.session.store.remove("current_user")
@@ -53,13 +53,13 @@ def home_view(page: ft.Page):
 
     confirm_dialog = ft.AlertDialog(
         title=ft.Text(
-            "Konfirmasi Logout",
+            "Konfirmasi Signout",
             weight=ft.FontWeight.BOLD,
             size=14,
             color=ft.Colors.YELLOW_600,
         ),
         content=ft.Text(
-            "Yakin Akan Logout...?",
+            "Yakin Akan Signout...?",
             size=13,
             color=ft.Colors.WHITE,
         ),
@@ -107,7 +107,7 @@ def home_view(page: ft.Page):
             ft.PopupMenuItem(),
             ft.PopupMenuItem(
                 icon=ft.Icons.LOGOUT,
-                content=ft.Text(value="Logout", size=12),
+                content=ft.Text(value="Signout", size=12),
                 on_click=open_confirm_logout,
                 height=15,
             ),

@@ -44,7 +44,7 @@ async def main(page: ft.Page):
         page.navigate("/loading")
 
         try:
-            await Api.post_user_activity(user_name, "Logout")
+            await Api.post_user_activity(user_name, "Signout")
         except Exception as err:
             DataFormatter.log_msg(
                 "koneksi internet bermasalah", tag="postuseractivity_error"
