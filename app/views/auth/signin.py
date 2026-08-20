@@ -197,7 +197,7 @@ def signin_view(page: ft.Page):
         cursor_color=ft.Colors.BLUE_400,
         text_style=ft.TextStyle(color=ft.Colors.WHITE),
         keyboard_type=ft.KeyboardType.EMAIL,
-        autofill_hints=[ft.AutofillHint.USERNAME],
+        autofill_hints=[ft.AutofillHint.EMAIL],
         on_submit=lambda e: page.run_task(next_focus, e, password_input),
     )
 
