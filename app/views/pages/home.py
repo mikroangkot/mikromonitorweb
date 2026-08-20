@@ -40,8 +40,9 @@ def home_view(page: ft.Page):
         except Exception as err:
             DataFormatter.log_msg("koneksi bermasalah", tag="signout_error")
 
-        await storage.remove("token")
         page.session.store.remove("current_user")
+        await storage.remove("current_user")
+        await storage.remove("token")
         page.navigate("/signin")
 
     def open_profile(e):

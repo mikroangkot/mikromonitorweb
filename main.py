@@ -50,8 +50,9 @@ async def main(page: ft.Page):
                 "koneksi internet bermasalah", tag="postuseractivity_error"
             )
 
-        await storage.remove("token")
         page.session.store.remove("current_user")
+        await storage.remove("current_user")
+        await storage.remove("token")
         page.navigate("/signin")
 
     dialog_exit = ft.AlertDialog(

@@ -20,7 +20,7 @@ def signup_view(page: ft.Page):
         default_assets_dir = Path(__file__).parent / "assets"
         return Path(os.environ.get("FLET_ASSETS_DIR", str(default_assets_dir)))
 
-    font_path = get_assets_dir() / "fonts" / "Rubrik.otf"
+    font_path = get_assets_dir() / "fonts" / "Consolas.ttf"
     if font_path.exists():
         captcha_generator = ImageCaptcha(width=300, height=80, fonts=[str(font_path)])
     else:

@@ -3,7 +3,7 @@ env/
 build/
 dist/
 __pycache__/
-*_backup
+*_backup*
 *.apk
 *.db
 *.jks

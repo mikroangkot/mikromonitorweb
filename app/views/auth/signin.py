@@ -16,11 +16,13 @@ from app.helpers.utility import state, connection, config
 
 def signin_view(page: ft.Page):
 
+    storage = DataFormatter()
+
     def get_assets_dir():
         default_assets_dir = Path(__file__).parent / "assets"
         return Path(os.environ.get("FLET_ASSETS_DIR", str(default_assets_dir)))
 
-    font_path = get_assets_dir() / "fonts" / "Rubrik.otf"
+    font_path = get_assets_dir() / "fonts" / "Consolas.ttf"
     if font_path.exists():
         captcha_generator = ImageCaptcha(width=300, height=80, fonts=[str(font_path)])
     else:
@@ -145,12 +147,10 @@ def signin_view(page: ft.Page):
     async def validasi_user():
         try:
             user_account = await Api.signin(email_input.value, password_input.value)
-
             if user_account and user_account.get("token"):
                 token = user_account.get("token")
                 user_payload = DataFormatter.decodetoken(token)
                 username = user_payload.get("nama")
-                storage = DataFormatter()
                 await storage.set("current_user", user_payload)
                 await storage.set("token", token)
 
