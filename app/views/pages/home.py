@@ -2,7 +2,7 @@ import flet as ft
 from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
 from app.helpers.utility import connection, config
-from app.views.pages import user
+from app.views.pages import Pages
 
 
 def home_view(page: ft.Page):
@@ -46,7 +46,7 @@ def home_view(page: ft.Page):
         page.navigate("/signin")
 
     def open_profile(e):
-        body_content.content = user.user_view(page)
+        body_content.content = Pages.user_view(page)
         body_content.update()
 
     def close_dialog(e):
@@ -172,14 +172,13 @@ def home_view(page: ft.Page):
         if selected_label == "Home":
             body_content.content = home_default_content
         elif selected_label == "Unit":
-            # body_content.content = unit.unit_view(page)
-            body_content.content = home_default_content
+            body_content.content = Pages.unit_view(page)
         elif selected_label == "KM Baku":
-            body_content.content = home_default_content
+            body_content.content = Pages.kmbaku_view(page)
         elif selected_label == "History":
-            body_content.content = home_default_content
+            body_content.content = Pages.history_view(page)
         elif selected_label == "Headway":
-            body_content.content = home_default_content
+            body_content.content = Pages.headway_view(page)
         else:
             body_content.content = ft.Container(
                 content=ft.Text(f"Halaman {selected_label}", size=20),
