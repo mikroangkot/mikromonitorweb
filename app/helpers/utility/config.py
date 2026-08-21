@@ -56,6 +56,14 @@ class Config:
         )
     )
 
+    HISTORY_BUS: str = field(
+        default_factory=lambda: (
+            val[0]
+            if (val := "#TEMPLATE_HISTORY_BUS#") and isinstance(val, list)
+            else os.getenv("HISTORY_BUS")
+        )
+    )
+
     HEADERS: ClassVar[dict] = {
         "User-Agent": "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
         "Accept": "application/json",

@@ -6,3 +6,4 @@ qrcode
 PyJWT
 bcrypt
 python-dotenv
+openpyxl
