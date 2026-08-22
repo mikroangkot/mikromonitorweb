@@ -25,7 +25,7 @@ def build_excel(data_history):
 		"Durasi",
 		"Nama Trip Perjalanan",
 		"KM Baku",
-		"Odometer Bus",
+		"Odometer",
 		"Nama Petugas"
 	]
 	ws.append(headers)
@@ -162,7 +162,7 @@ def history_view(page: ft.Page):
 		page.run_task(fetch_history, buscode)
 
 	search_input = ft.TextField(
-		label=ft.Text("Kode Bus:", size=13),
+		label=ft.Text("Kode Bus", size=13),
 		text_style=ft.TextStyle(color=ft.Colors.WHITE, size=13),
 		border=ft.InputBorder.NONE,
 		border_color=ft.Colors.GREY_400,
@@ -205,9 +205,7 @@ def history_view(page: ft.Page):
 		btn_export.visible = False
 		loading_spinner.visible = True
 		page.update()
-
 		timeout = httpx.Timeout(120.0, connect=10.0)
-
 		try:
 			async with httpx.AsyncClient(timeout=timeout) as client:
 				response = await client.get(

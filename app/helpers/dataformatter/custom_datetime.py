@@ -16,12 +16,12 @@ class FormatDatetime:
 	@staticmethod
 	def format_jam(jam):
 		if not jam:
-			return "-"
+			return "00:00:00"
 		try:
 			jam_obj = datetime.strptime(str(jam).split(".")[0], "%Y-%m-%d %H:%M:%S")
 			return jam_obj.strftime("%H:%M:%S")
 		except ValueError:
-			return str(jam)[11:16] if len(str(jam)) >= 16 else "-"
+			return str(jam)[11:19] if len(str(jam)) >= 19 else "00:00:00"
 
 	@staticmethod
 	def hitung_durasi(start, end):
@@ -31,7 +31,7 @@ class FormatDatetime:
 			start_time = datetime.fromisoformat(start.replace("Z", "").replace(" ", "T"))
 			end_time = datetime.fromisoformat(end.replace("Z", "").replace(" ", "T"))
 			selisih = end_time - start_time
-			total_detik = int(selisih.total_second())
+			total_detik = int(selisih.total_seconds())
 			if total_detik < 0:
 				return "00:00:00"
 			jam = total_detik // 3600
