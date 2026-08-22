@@ -79,6 +79,8 @@ def history_view(page: ft.Page):
 	profile = page.session.store.get("current_user")
 	username = profile.get("nama", "-")
 	state_data = {"data_history": []}
+	status_text = ft.Text(value="")
+	rekapan = ft.Container(content=ft.Row(controls=[status_text]))
 	daftar_konten = ft.ListView(spacing=1, padding=1, expand=True)
 
 	async def export_excel(e):
@@ -102,6 +104,7 @@ def history_view(page: ft.Page):
 			)
 			if save_path:
 				DataFormatter.show_snackbar(page, "Data berhasil disimpan...!!!", "GREEN_900")
+				page.run_task(Api.useractivity, username, f"Download Data History {search_input.value} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
 				btn_export.visible = False
 			else:
 				DataFormatter.show_snackbar(page, "Penyimpanan dibatalkan...!!!", "YELLOW_900")
@@ -119,9 +122,6 @@ def history_view(page: ft.Page):
 		alignment=ft.MainAxisAlignment.START,
 		expand=True
 	)
-
-	status_text = ft.Text(value="")
-	rekapan = ft.Container(content=ft.Row(controls=[status_text]))
 
 	loading_spinner = ft.Container(
 		content=ft.Column(

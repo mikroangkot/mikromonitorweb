@@ -103,6 +103,7 @@ def headway_view(page: ft.Page):
 			)
 			if save_path:
 				DataFormatter.show_snackbar(page, "Data berhasil disimpan...!!!", "GREEN_900")
+				page.run_task(Api.useractivity, username, f"Download Data Headway {search_input.value} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
 				btn_export.visible = False
 			else:
 				DataFormatter.show_snackbar(page, "Penyimpanan dibatalkan...!!!", "YELLOW_900")
@@ -158,7 +159,7 @@ def headway_view(page: ft.Page):
 			response = httpx.get(config.LOKASI_HEADWAY)
 			if response.is_success:
 				result = response.json()
-				state_data["data_lokasi"] = [item["area"].replace(" ", "") for item in result if "area" in item]
+				state_data["data_lokasi"] = sorted([item["area"].replace(" ", "") for item in result if "area" in item], key=str.lower)
 		except Exception as err:
 			DataFormatter.log_msg(err)
 
@@ -177,6 +178,7 @@ def headway_view(page: ft.Page):
 		expand=True,
 		width=310,
 		key="lokasi_key",
+		editable=True,
 		label="Lokasi",
 		options=dropdown_option
 	)
