@@ -74,6 +74,9 @@ def headway_view(page: ft.Page):
 	profile = page.session.store.get("current_user")
 	username = profile.get("nama", "-")
 	state_data = {"data_headway": []}
+	state_data = {"data_lokasi": []}
+	status_text = ft.Text(value="")
+	rekapan = ft.Container(content=ft.Row(controls=[status_text]))
 	daftar_konten = ft.ListView(spacing=1, padding=1, expand=True)
 
 	async def export_excel(e):
@@ -118,9 +121,6 @@ def headway_view(page: ft.Page):
 		expand=True
 	)
 
-	status_text = ft.Text(value="")
-	rekapan = ft.Container(content=ft.Row(controls=[status_text]))
-
 	loading_spinner = ft.Container(
 		content=ft.Column(
 			controls=[ft.ProgressRing(width=45, height=45, color=ft.Colors.YELLOW_400), ft.Text("Sedang memuat data...", size=13, color=ft.Colors.WHITE)],
@@ -143,13 +143,8 @@ def headway_view(page: ft.Page):
 		actions_alignment=ft.MainAxisAlignment.END
 	)
 
-	def input_change(e):
-		headway_value = search_input.value.upper().strip()
-		search_input.value = headway_value
-		page.update()
-
 	def search_click(e):
-		headway_rute = search_input.value.strip()
+		headway_rute = search_input.value
 		if not headway_rute:
 			page.show_dialog(dialog_popup)
 			status_text.value = ""
@@ -159,17 +154,33 @@ def headway_view(page: ft.Page):
 		page.update()
 		page.run_task(fetch_headway, headway_rute)
 
-	search_input = ft.TextField(
-		label=ft.Text("Masukkan [Lokasi]/[Rute]", size=13),
+	def fetch_lokasi():
+		try:
+			response = httpx.get(config.LOKASI_HEADWAY)
+			if response.is_success:
+				result = response.json()
+				state_data["data_lokasi"] = [item["area"].replace(" ", "") for item in result if "area" in item]
+		except Exception as err:
+			DataFormatter.log_msg(err)
+
+	fetch_lokasi()
+
+	dropdown_option = [
+		ft.DropdownOption(key=area, content=ft.Text(value=area))
+		for area in state_data["data_lokasi"]
+	]
+
+	search_input = ft.Dropdown(
 		text_style=ft.TextStyle(color=ft.Colors.WHITE, size=13),
 		border=ft.InputBorder.NONE,
 		border_color=ft.Colors.GREY_400,
-		prefix_icon=ft.Icons.DIRECTIONS_BUS,
-		cursor_color=ft.Colors.BLUE_400,
 		autofocus=True,
 		expand=True,
-		on_change=input_change,
-		on_submit=search_click
+		width=310,
+		key="lokasi_key",
+		editable=True,
+		label="Lokasi",
+		options=dropdown_option
 	)
 
 	search_button = ft.IconButton(
