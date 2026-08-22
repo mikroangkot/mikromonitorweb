@@ -62,7 +62,7 @@ def build_excel(data_headway, rute):
 		max_len = max(len(str(cell.value or "")) for cell in col)
 		col_letter = openpyxl.utils.get_column_letter(col[0].column)
 		ws.column_dimensions[col_letter].width = max(max_len + 3, 12)
-		if col_letter in ["F", "G", "H", "I"]:
+		if col_letter in ["A", "F", "G", "H", "I"]:
 			for cell in col[1:]:
 				cell.alignment = align_center_data
 	excel_stream = io.BytesIO()
@@ -228,7 +228,7 @@ def headway_view(page: ft.Page):
 						total_data = len(result["getdata"])
 						bus_unik = set(item.get("bus_code") for item in result["getdata"] if item.get("bus_code"))
 						total_unit = len(bus_unik)
-						status_text.value = (f"TOTAL UNIT : {total_unit}    ||    TOTAL Data : {total_data}")
+						status_text.value = (f"TOTAL UNIT : {total_unit}    ||    TOTAL DATA : {total_data}")
 						status_text.color = ft.Colors.YELLOW_400
 						status_text.size = 13
 						for index, item in enumerate(result["getdata"]):
