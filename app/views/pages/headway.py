@@ -144,15 +144,14 @@ def headway_view(page: ft.Page):
 	)
 
 	def search_click(e):
-		headway_rute = search_input.value
-		if not headway_rute:
+		if not search_input.value:
 			page.show_dialog(dialog_popup)
 			status_text.value = ""
 			daftar_konten.controls.clear()
 			page.update()
 			return None
 		page.update()
-		page.run_task(fetch_headway, headway_rute)
+		page.run_task(fetch_headway, search_input.value)
 
 	def fetch_lokasi():
 		try:
@@ -178,7 +177,6 @@ def headway_view(page: ft.Page):
 		expand=True,
 		width=310,
 		key="lokasi_key",
-		editable=True,
 		label="Lokasi",
 		options=dropdown_option
 	)
