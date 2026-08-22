@@ -42,7 +42,7 @@ jobs:
       - name: Build APK
         env:
           APP_ENV: "production"
-          APP_NAME: "Project RoadTrip"
+          APP_NAME: "Mikro Monitor"
           APP_VERSION: "1.${{ github.run_number }}"
           API_URL: ${{ secrets.API_URL }}
           API_CDN: ${{ secrets.API_CDN }}
@@ -67,8 +67,8 @@ jobs:
           flutter config --no-analytics
           flet build apk \
             --clear-cache \
-            --project "Project RoadTrip" \
-            --bundle-id "com.rumahdjigo.project_roadtrip" \
+            --project "Mikro Monitor" \
+            --bundle-id "com.rumahdjigo.mikromonitor" \
             --company "RumahDjigo" \
             --copyright "Copyright © 2026 RumahDjigo. All Rights Reserved." \
             --build-version "1.${{ github.run_number }}" \
@@ -116,5 +116,5 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: ProjectRoadTrip-v.${{ github.run_number }}
+          name: MikroMonitor-v.${{ github.run_number }}
           path: dist_app/*.apk
