@@ -37,7 +37,7 @@ def offline_view(page: ft.Page, on_retry_click):
                 color=ft.Colors.WHITE,
             ),
             ft.Text(
-                "Koneksi internet bermasalah atau server tidak merespons.\nSilakan periksa jaringan Anda.",
+                "Koneksi internet bermasalah atau server tidak merespons.\nSilakan ulangi beberapa saat lagi...!!!",
                 size=13,
                 color=ft.Colors.GREY_400,
                 text_align=ft.TextAlign.CENTER,

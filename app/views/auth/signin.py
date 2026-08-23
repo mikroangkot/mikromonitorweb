@@ -67,9 +67,7 @@ def signin_view(page: ft.Page):
             pass
 
         if not is_online:
-            DataFormatter.show_snackbar(
-                page, "Koneksi internet bermasalah", "YELLOW_900"
-            )
+            DataFormatter.show_snackbar(page, "Koneksi internet bermasalah", "YELLOW_900")
 
     connection.Connectivity(page, on_change=on_network_change)
 
