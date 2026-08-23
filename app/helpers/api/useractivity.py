@@ -18,7 +18,7 @@ class UserActivity:
         lat_long = f"https://www.google.com/maps/search/?api=1&query={lokasi.get('latlong') or '0.0,0.0'}"
         query_params = {"page": "useractivity"}
         payload = {
-            "app_name": f"{config.APP_NAME} V.{config.APP_VERSION}",
+            "app_name": f"{config.APP_NAME} Versi {config.APP_VERSION}",
             "username": username,
             "last_activity": last_activity,
             "ip_address": ip_address,
