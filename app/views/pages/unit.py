@@ -222,7 +222,7 @@ def unit_view(page: ft.Page):
 							)
 							daftar_konten.controls.append(item_box)
 						btn_export.visible = True
-						page.run_task(Api.useractivity, username, f"View Data {kode}")
+						page.run_task(Api.useractivity, username, f"View Data Unit {kode}")
 					else:
 						DataFormatter.show_snackbar(page, "Data tidak ditemukan...!!!", "YELLOW_900")
 						return None
