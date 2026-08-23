@@ -17,6 +17,7 @@ from app.helpers.utility import state, connection, config
 def signin_view(page: ft.Page):
 
     storage = DataFormatter()
+    current_captcha_text = ""
 
     def get_assets_dir():
         default_assets_dir = Path(__file__).parent / "assets"
@@ -27,7 +28,6 @@ def signin_view(page: ft.Page):
         captcha_generator = ImageCaptcha(width=300, height=80, fonts=[str(font_path)])
     else:
         captcha_generator = ImageCaptcha(width=300, height=80)
-    current_captcha_text = ""
 
     def generate_random_text(length=5):
         characters = string.ascii_uppercase + string.digits
@@ -36,9 +36,7 @@ def signin_view(page: ft.Page):
     def refresh_captcha_ui(e=None):
         nonlocal current_captcha_text
         current_captcha_text = generate_random_text()
-        image_data = captcha_generator.generate(
-            current_captcha_text, bg_color=(30, 30, 40), fg_color=(240, 240, 240)
-        )
+        image_data = captcha_generator.generate(current_captcha_text, bg_color=(30, 30, 40), fg_color=(240, 240, 240))
         image_bytes = io.BytesIO(image_data.read())
         raw_bytes = image_bytes.getvalue()
         base64_string = base64.b64encode(raw_bytes).decode("utf-8")
@@ -55,7 +53,7 @@ def signin_view(page: ft.Page):
         height=13,
         border_radius=6.5,
         bgcolor=ft.Colors.GREY_500,
-        tooltip="Cek Koneksi...",
+        tooltip="Cek Koneksi..."
     )
 
     async def on_network_change(is_online: bool, connection_types):
@@ -65,7 +63,6 @@ def signin_view(page: ft.Page):
             status_dot.update()
         except Exception:
             pass
-
         if not is_online:
             DataFormatter.show_snackbar(page, "Koneksi internet bermasalah", "YELLOW_900")
 
@@ -74,17 +71,13 @@ def signin_view(page: ft.Page):
     def progress_signin_button():
         signin_button.disabled = True
         signin_button.icon = None
-        signin_button.content = ft.ProgressRing(
-            width=20, height=20, color=ft.Colors.YELLOW_400
-        )
+        signin_button.content = ft.ProgressRing(width=20, height=20, color=ft.Colors.YELLOW_400)
         page.update()
 
     def reset_signin_button():
         signin_button.disabled = False
         signin_button.icon = ft.Icons.FINGERPRINT
-        signin_button.content = ft.Text(
-            "Masuk", color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD
-        )
+        signin_button.content = ft.Text("Masuk", color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD)
         page.update()
 
     def close_dialog(e):
@@ -96,16 +89,16 @@ def signin_view(page: ft.Page):
             weight=ft.FontWeight.BOLD,
             size=14,
             color=ft.Colors.YELLOW_600,
-            text_align=ft.TextAlign.CENTER,
+            text_align=ft.TextAlign.CENTER
         ),
         content=ft.Text(
             "Silahkan hubungi admin...!!!",
             size=13,
             color=ft.Colors.WHITE,
-            text_align=ft.TextAlign.CENTER,
+            text_align=ft.TextAlign.CENTER
         ),
         actions=[ft.TextButton("OK", on_click=close_dialog)],
-        actions_alignment=ft.MainAxisAlignment.END,
+        actions_alignment=ft.MainAxisAlignment.END
     )
 
     def show_admin_contact(e):
@@ -113,18 +106,12 @@ def signin_view(page: ft.Page):
 
     def signin_clicked(e):
         if not email_input.value.strip() or not password_input.value.strip():
-            DataFormatter.show_snackbar(
-                page, "Insert Email and Password..!!!", "YELLOW_900"
-            )
-            return
-
+            DataFormatter.show_snackbar(page, "Insert Email and Password..!!!", "YELLOW_900")
+            return None
         if captcha_input.value.strip().upper() != current_captcha_text:
-            DataFormatter.show_snackbar(
-                page, "Kode Keamanan (CAPTCHA) tidak sesuai...!!!", "YELLOW_900"
-            )
+            DataFormatter.show_snackbar(page, "Kode Keamanan (CAPTCHA) tidak sesuai...!!!", "YELLOW_900")
             refresh_captcha_ui()
-            return
-
+            return None
         progress_signin_button()
         page.run_task(validasi_user)
 
@@ -136,8 +123,7 @@ def signin_view(page: ft.Page):
         try:
             if getattr(state, "register_status", None) == "close":
                 show_admin_contact(e)
-                return
-
+                return None
             page.navigate("/signup")
         except Exception as err:
             show_admin_contact(e)
@@ -151,37 +137,24 @@ def signin_view(page: ft.Page):
                 username = user_payload.get("nama")
                 await storage.set("current_user", user_payload)
                 await storage.set("token", token)
-
                 if not page.session.store.contains_key("current_user"):
                     page.session.store.set("current_user", user_payload)
-
                 email_input.value = ""
                 password_input.value = ""
-
                 page.navigate("/home")
-                DataFormatter.show_snackbar(
-                    page,
-                    f"Selamat Datang {username}",
-                    "GREEN_900",
-                )
+                DataFormatter.show_snackbar(page, f"Selamat Datang {username}", "GREEN_900")
                 page.run_task(Api.useractivity, username, "Signin")
-                return
-
+                return None
             else:
-                DataFormatter.show_snackbar(
-                    page, "Username atau Password tidak sesuai...!!!", "YELLOW_900"
-                )
-
+                DataFormatter.show_snackbar(page, "Username atau Password tidak sesuai...!!!", "YELLOW_900")
                 refresh_captcha_ui()
-                return
-
+                return None
         except Exception as err:
             DataFormatter.log_msg(f"{err}", tag="signin_error")
             DataFormatter.show_snackbar(
                 page, "Koneksi internet bermasalah...!!!", "YELLOW_900"
             )
-            return
-
+            return None
         finally:
             reset_signin_button()
 
@@ -196,7 +169,7 @@ def signin_view(page: ft.Page):
         text_style=ft.TextStyle(color=ft.Colors.WHITE),
         keyboard_type=ft.KeyboardType.EMAIL,
         autofill_hints=[ft.AutofillHint.EMAIL],
-        on_submit=lambda e: page.run_task(next_focus, e, password_input),
+        on_submit=lambda e: page.run_task(next_focus, e, password_input)
     )
 
     password_input = ft.TextField(
@@ -211,21 +184,21 @@ def signin_view(page: ft.Page):
         password=True,
         can_reveal_password=True,
         autofill_hints=[ft.AutofillHint.PASSWORD],
-        on_submit=lambda e: page.run_task(next_focus, e, captcha_input),
+        on_submit=lambda e: page.run_task(next_focus, e, captcha_input)
     )
 
     captcha_image = ft.Image(
         src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII=",
         width=150,
         height=40,
-        fit=ft.BoxFit.CONTAIN,
+        fit=ft.BoxFit.CONTAIN
     )
 
     captcha_refresh_btn = ft.IconButton(
         icon=ft.Icons.REFRESH_ROUNDED,
         icon_color=ft.Colors.BLUE_400,
         on_click=refresh_captcha_ui,
-        tooltip="Ganti Kode Baru",
+        tooltip="Ganti Kode Baru"
     )
 
     captcha_input = ft.TextField(
@@ -237,7 +210,7 @@ def signin_view(page: ft.Page):
         cursor_color=ft.Colors.BLUE_400,
         text_style=ft.TextStyle(color=ft.Colors.WHITE),
         on_submit=signin_clicked,
-        on_change=on_input_change,
+        on_change=on_input_change
     )
 
     refresh_captcha_ui()
@@ -248,19 +221,17 @@ def signin_view(page: ft.Page):
         height=50,
         bgcolor=ft.Colors.BLUE_600,
         icon=ft.Icons.FINGERPRINT,
-        on_click=signin_clicked,
+        on_click=signin_clicked
     )
 
     app_icon = ft.Container(
-        content=ft.Image(
-            src="/images/icon.gif", width=200, height=200, fit=ft.BoxFit.CONTAIN, color=ft.Colors.WHITE
-        ),
+        content=ft.Image(src="/images/icon.gif", width=200, height=200, fit=ft.BoxFit.CONTAIN, color=ft.Colors.WHITE),
         margin=ft.Margin(bottom=-35)
     )
 
     app_name = ft.Container(
         content=ft.Text(value=config.APP_NAME, size=25, weight=ft.FontWeight.BOLD),
-        alignment=ft.Alignment.CENTER,
+        alignment=ft.Alignment.CENTER
     )
 
     footer_text = ft.Container(
@@ -268,12 +239,12 @@ def signin_view(page: ft.Page):
             "Copyright © 2026 RumahDjigo",
             size=12,
             color=ft.Colors.WHITE_70,
-            weight=ft.FontWeight.W_300,
+            weight=ft.FontWeight.W_300
         ),
         bottom=0,
         left=0,
         right=0,
-        alignment=ft.Alignment.CENTER,
+        alignment=ft.Alignment.CENTER
     )
 
     nomor_wa = None
@@ -287,19 +258,17 @@ def signin_view(page: ft.Page):
         await ft.UrlLauncher().launch_url(
             f"https://wa.me/{nomor_wa}?text={urllib.parse.quote('Hallo admin...???')}",
             mode=ft.LaunchMode.EXTERNAL_APPLICATION,
-            web_only_window_name="_blank",
+            web_only_window_name="_blank"
         )
 
     whatsapp_icon = ft.FloatingActionButton(
-        content=ft.Image(
-            src="/images/whatsapp.svg", width=30, height=30, fit=ft.BoxFit.COVER
-        ),
+        content=ft.Image(src="/images/whatsapp.svg", width=30, height=30, fit=ft.BoxFit.COVER),
         width=45,
         height=45,
         bgcolor="#25D366",
         shape=ft.CircleBorder(),
         on_click=lambda e: page.run_task(call_admin, e),
-        tooltip="Hubungi Admin",
+        tooltip="Hubungi Admin"
     )
 
     signin_default_content = ft.Stack(
@@ -308,77 +277,69 @@ def signin_view(page: ft.Page):
                 content=ft.Column(
                     controls=[
                         ft.Column(
-                            [
-                                app_icon,
-                                app_name,
-                                ft.Text(f"Versi {config.APP_VERSION}", size=17),
-                            ],
+                            [app_icon, app_name, ft.Text(f"Versi {config.APP_VERSION}", size=17)],
                             spacing=0,
                             horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                             alignment=ft.MainAxisAlignment.CENTER,
                             expand=True,
-                            margin=ft.Margin(bottom=10),
+                            margin=ft.Margin(bottom=10)
                         ),
                         ft.AutofillGroup(
                             content=ft.Column(
                                 controls=[email_input, password_input],
                                 spacing=0,
-                                margin=ft.Margin(bottom=5),
+                                margin=ft.Margin(bottom=5)
                             )
                         ),
                         ft.Row(
                             controls=[
                                 ft.Container(
                                     content=captcha_image,
-                                    alignment=ft.Alignment.CENTER,
+                                    alignment=ft.Alignment.CENTER
                                 ),
                                 captcha_refresh_btn,
-                                ft.Container(content=captcha_input),
+                                ft.Container(content=captcha_input)
                             ],
                             alignment=ft.MainAxisAlignment.CENTER,
                             vertical_alignment=ft.CrossAxisAlignment.CENTER,
                             width=310,
-                            spacing=0,
+                            spacing=0
                         ),
                         ft.Row(
                             [
                                 ft.Button(
-                                    content=ft.Text(
-                                        "Lupa Password?", color=ft.Colors.BLUE_300
-                                    ),
-                                    on_click=show_admin_contact,
+                                    content=ft.Text("Lupa Password?", color=ft.Colors.BLUE_300),
+                                    on_click=show_admin_contact
                                 )
                             ],
                             alignment=ft.MainAxisAlignment.END,
                             margin=ft.Margin(bottom=10, top=10),
-                            width=310,
+                            width=310
                         ),
                         signin_button,
                         ft.Row(
                             [
                                 ft.Text("Belum punya akun?", color=ft.Colors.WHITE),
                                 ft.Button(
-                                    content=ft.Text(
-                                        "Daftar Sekarang", color=ft.Colors.BLUE_300
-                                    ),
-                                    on_click=signup_account,
-                                ),
+                                    content=ft.Text("Daftar Sekarang", color=ft.Colors.BLUE_300),
+                                    on_click=signup_account
+                                )
                             ],
                             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                             margin=ft.Margin(top=10),
-                            width=310,
-                        ),
+                            width=310
+                        )
                     ],
                     alignment=ft.MainAxisAlignment.CENTER,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     scroll=ft.ScrollMode.AUTO,
                     spacing=0,
-                    expand=True,
+                    expand=True
                 ),
                 margin=ft.Margin(bottom=50)
             )
         ],
-        expand=True,
+        expand=True
     )
 
     body_content = ft.Container(content=signin_default_content, expand=True)
@@ -392,19 +353,19 @@ def signin_view(page: ft.Page):
                             content=ft.Row(
                                 [status_dot],
                                 alignment=ft.MainAxisAlignment.START,
-                                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                                vertical_alignment=ft.CrossAxisAlignment.CENTER
                             ),
-                            padding=ft.Padding(left=10, top=10, right=10, bottom=0),
+                            padding=ft.Padding(left=10, top=10, right=10, bottom=0)
                         )
                     ],
-                    spacing=0,
+                    spacing=0
                 )
             ),
-            body_content,
+            body_content
         ],
         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        expand=True,
+        expand=True
     )
 
     main_container = ft.Container(content=main_content, width=390, height=844)
@@ -417,11 +378,11 @@ def signin_view(page: ft.Page):
                 width=390,
                 height=844,
                 gapless_playback=True,
-                color=ft.Colors.GREY_800,
+                color=ft.Colors.GREY_800
             ),
             footer_text,
             main_container,
-            ft.Container(content=whatsapp_icon, bottom=10, right=10),
+            ft.Container(content=whatsapp_icon, bottom=10, right=10)
         ]
     )
 
@@ -431,9 +392,7 @@ def signin_view(page: ft.Page):
         controls=[
             ft.SafeArea(
                 expand=True,
-                content=ft.Container(
-                    content=main_layout, alignment=ft.Alignment.CENTER, expand=True
-                ),
+                content=ft.Container(content=main_layout, alignment=ft.Alignment.CENTER, expand=True)
             )
-        ],
+        ]
     )

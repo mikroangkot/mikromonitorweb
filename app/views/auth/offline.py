@@ -9,7 +9,7 @@ def offline_view(page: ft.Page, on_retry_click):
         height=13,
         border_radius=6.5,
         bgcolor=ft.Colors.GREY_500,
-        tooltip="Cek Koneksi...",
+        tooltip="Cek Koneksi..."
     )
 
     async def on_network_change(is_online: bool, connection_types):
@@ -19,11 +19,8 @@ def offline_view(page: ft.Page, on_retry_click):
             status_dot.update()
         except Exception:
             pass
-
         if not is_online:
-            DataFormatter.show_snackbar(
-                page, "Koneksi internet bermasalah", "YELLOW_900"
-            )
+            DataFormatter.show_snackbar(page, "Koneksi internet bermasalah", "YELLOW_900")
 
     connection.Connectivity(page, on_change=on_network_change)
 
@@ -34,24 +31,24 @@ def offline_view(page: ft.Page, on_retry_click):
                 "Koneksi Bermasalah",
                 size=18,
                 weight=ft.FontWeight.BOLD,
-                color=ft.Colors.WHITE,
+                color=ft.Colors.WHITE
             ),
             ft.Text(
                 "Koneksi internet bermasalah atau server tidak merespons.\nSilakan ulangi beberapa saat lagi...!!!",
                 size=13,
                 color=ft.Colors.GREY_400,
-                text_align=ft.TextAlign.CENTER,
+                text_align=ft.TextAlign.CENTER
             ),
             ft.Container(height=10),
             ft.FilledButton(
                 "Coba Lagi",
                 on_click=on_retry_click,
-                style=ft.ButtonStyle(color=ft.Colors.WHITE, bgcolor=ft.Colors.BLUE_600),
-            ),
+                style=ft.ButtonStyle(color=ft.Colors.WHITE, bgcolor=ft.Colors.BLUE_600)
+            )
         ],
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
         alignment=ft.MainAxisAlignment.CENTER,
-        spacing=15,
+        spacing=15
     )
 
     body_content = ft.Container(content=offline_default_content, expand=True)
@@ -65,19 +62,19 @@ def offline_view(page: ft.Page, on_retry_click):
                             content=ft.Row(
                                 [status_dot],
                                 alignment=ft.MainAxisAlignment.START,
-                                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                                vertical_alignment=ft.CrossAxisAlignment.CENTER
                             ),
-                            padding=ft.Padding(left=10, top=10, right=10, bottom=10),
+                            padding=ft.Padding(left=10, top=10, right=10, bottom=10)
                         )
                     ],
-                    spacing=0,
+                    spacing=0
                 )
             ),
-            body_content,
+            body_content
         ],
         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        expand=True,
+        expand=True
     )
 
     main_container = ft.Container(content=main_content, width=390, height=844)
@@ -90,9 +87,9 @@ def offline_view(page: ft.Page, on_retry_click):
                 width=390,
                 height=844,
                 gapless_playback=True,
-                color=ft.Colors.GREY_800,
+                color=ft.Colors.GREY_800
             ),
-            main_container,
+            main_container
         ]
     )
 
@@ -103,9 +100,7 @@ def offline_view(page: ft.Page, on_retry_click):
         controls=[
             ft.SafeArea(
                 expand=True,
-                content=ft.Container(
-                    content=main_layout, alignment=ft.Alignment.CENTER, expand=True
-                ),
+                content=ft.Container(content=main_layout, alignment=ft.Alignment.CENTER, expand=True)
             )
-        ],
+        ]
     )

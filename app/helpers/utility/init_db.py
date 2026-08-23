@@ -4,7 +4,6 @@ import sqlite3
 async def init_db():
     with sqlite3.connect("project.db") as conn:
         cursor = conn.cursor()
-
         cursor.execute("""
 			CREATE TABLE IF NOT EXISTS user_activities(
 				id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -17,5 +16,4 @@ async def init_db():
 				datetime_created TIMESTAMP DEFAULT (datetime('now', 'localtime'))
 			)
 		""")
-
         conn.commit()

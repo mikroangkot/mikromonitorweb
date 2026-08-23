@@ -10,11 +10,11 @@ def notfound_404_view(page: ft.Page):
                 content=ft.Image(
                     src="/images/alien.svg",
                     fit=ft.BoxFit.CONTAIN,
-                    color=ft.Colors.WHITE_70,
+                    color=ft.Colors.WHITE_70
                 ),
                 width=280,
                 height=280,
-                alignment=ft.Alignment.CENTER,
+                alignment=ft.Alignment.CENTER
             ),
             ft.Container(
                 alignment=ft.Alignment.CENTER,
@@ -26,25 +26,25 @@ def notfound_404_view(page: ft.Page):
                             value="404",
                             size=65,
                             weight=ft.FontWeight.BOLD,
-                            color="#2ccf6d",
+                            color="#2ccf6d"
                         ),
                         ft.Text(
                             value="Oooups! You're lost...",
                             size=18,
                             weight=ft.FontWeight.BOLD,
                             color=ft.Colors.WHITE,
-                            text_align=ft.TextAlign.CENTER,
+                            text_align=ft.TextAlign.CENTER
                         ),
                         ft.Text(
                             value="The page you are looking for does not exist. How you got here is a mystery. But you can click the button below to go back to the homepage.",
                             size=16,
                             color=ft.Colors.WHITE_70,
-                            text_align=ft.TextAlign.CENTER,
-                        ),
-                    ],
-                ),
-            ),
-        ],
+                            text_align=ft.TextAlign.CENTER
+                        )
+                    ]
+                )
+            )
+        ]
     )
 
     main_container = ft.Container(
@@ -52,7 +52,7 @@ def notfound_404_view(page: ft.Page):
         width=390,
         height=844,
         padding=15,
-        alignment=ft.Alignment.CENTER,
+        alignment=ft.Alignment.CENTER
     )
 
     footer = ft.Container(
@@ -60,12 +60,12 @@ def notfound_404_view(page: ft.Page):
             value=f"Copyright © 2016 RumahDjigo",
             size=12,
             color=ft.Colors.WHITE_70,
-            weight=ft.FontWeight.W_300,
+            weight=ft.FontWeight.W_300
         ),
         bottom=5,
         left=0,
         right=0,
-        alignment=ft.Alignment.CENTER,
+        alignment=ft.Alignment.CENTER
     )
 
     main_layout = ft.Stack(
@@ -79,9 +79,9 @@ def notfound_404_view(page: ft.Page):
                 color=ft.Colors.GREY_800,
             ),
             main_container,
-            footer,
+            footer
         ],
-        expand=True,
+        expand=True
     )
 
     return ft.View(
@@ -90,9 +90,7 @@ def notfound_404_view(page: ft.Page):
         controls=[
             ft.SafeArea(
                 expand=True,
-                content=ft.Container(
-                    content=main_layout, alignment=ft.Alignment.CENTER, expand=True
-                ),
+                content=ft.Container(content=main_layout, alignment=ft.Alignment.CENTER, expand=True)
             )
-        ],
+        ]
     )

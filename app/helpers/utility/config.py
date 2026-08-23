@@ -4,14 +4,12 @@ from typing import ClassVar
 
 try:
     from dotenv import load_dotenv
-
     try:
         load_dotenv()
     except (ImportError, AssertionError, Exception):
         pass
 except ImportError:
     pass
-
 
 @dataclass(frozen=True)
 class Config:
@@ -100,6 +98,5 @@ class Config:
         "User-Agent": "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
         "Accept": "application/json",
     }
-
 
 config = Config()

@@ -34,12 +34,10 @@ def home_view(page: ft.Page):
         page.pop_dialog()
         page.views.clear()
         page.navigate("/loading")
-
         try:
             await Api.useractivity(user_name, "Signout")
         except Exception as err:
             DataFormatter.log_msg("koneksi bermasalah", tag="signout_error")
-
         page.session.store.remove("current_user")
         await storage.remove("current_user")
         await storage.remove("token")
@@ -57,18 +55,18 @@ def home_view(page: ft.Page):
             "Konfirmasi Signout",
             weight=ft.FontWeight.BOLD,
             size=14,
-            color=ft.Colors.YELLOW_600,
+            color=ft.Colors.YELLOW_600
         ),
         content=ft.Text(
             "Yakin Akan Signout...?",
             size=13,
-            color=ft.Colors.WHITE,
+            color=ft.Colors.WHITE
         ),
         actions=[
             ft.TextButton("Batal", on_click=close_dialog),
-            ft.TextButton("Ya", on_click=proses_logout),
+            ft.TextButton("Ya", on_click=proses_logout)
         ],
-        actions_alignment=ft.MainAxisAlignment.END,
+        actions_alignment=ft.MainAxisAlignment.END
     )
 
     def open_confirm_logout(e):
@@ -82,43 +80,41 @@ def home_view(page: ft.Page):
                     value=user_name,
                     size=12,
                     weight=ft.FontWeight.W_500,
-                    color=ft.Colors.WHITE,
+                    color=ft.Colors.WHITE
                 ),
                 ft.Container(
                     content=ft.Image(
                         src=f"{config.API_CDN}/images/{user_image}",
-                        fit=ft.BoxFit.COVER,
+                        fit=ft.BoxFit.COVER
                     ),
                     width=25,
                     height=25,
                     border_radius=18,
-                    clip_behavior=ft.ClipBehavior.ANTI_ALIAS,
-                ),
+                    clip_behavior=ft.ClipBehavior.ANTI_ALIAS
+                )
             ],
             tight=True,
-            vertical_alignment=ft.CrossAxisAlignment.CENTER,
+            vertical_alignment=ft.CrossAxisAlignment.CENTER
         ),
         items=[
             ft.PopupMenuItem(
                 icon=ft.Icons.PERSON,
                 content=ft.Text(value="My Account", size=12),
                 on_click=open_profile,
-                height=15,
+                height=15
             ),
             ft.PopupMenuItem(),
             ft.PopupMenuItem(
                 icon=ft.Icons.LOGOUT,
                 content=ft.Text(value="Signout", size=12),
                 on_click=open_confirm_logout,
-                height=15,
-            ),
-        ],
+                height=15
+            )
+        ]
     )
 
     app_icon = ft.Container(
-        content=ft.Image(
-            src="/images/icon.gif", width=200, height=200, fit=ft.BoxFit.CONTAIN, color=ft.Colors.WHITE
-        ),
+        content=ft.Image(src="/images/icon.gif", width=200, height=200, fit=ft.BoxFit.CONTAIN, color=ft.Colors.WHITE),
         alignment=ft.Alignment.CENTER,
         margin=ft.Margin(bottom=-35)
     )
@@ -126,7 +122,7 @@ def home_view(page: ft.Page):
     app_name = ft.Container(
         content=ft.Text(value=config.APP_NAME, size=25, weight=ft.FontWeight.BOLD),
         alignment=ft.Alignment.CENTER,
-        margin=ft.Margin(top=10),
+        margin=ft.Margin(top=10)
     )
 
     footer_text = ft.Container(
@@ -134,34 +130,30 @@ def home_view(page: ft.Page):
             f"Copyright © 2026 RumahDjigo",
             size=12,
             color=ft.Colors.WHITE_70,
-            weight=ft.FontWeight.W_300,
+            weight=ft.FontWeight.W_300
         ),
         bottom=0,
         left=0,
         right=0,
         margin=ft.Margin(bottom=-5),
-        alignment=ft.Alignment.CENTER,
+        alignment=ft.Alignment.CENTER
     )
 
     home_default_content = ft.Stack(
         [
             ft.Container(
                 content=ft.Column(
-                    [
-                        app_icon,
-                        app_name,
-                        ft.Text(f"Versi {config.APP_VERSION}", size=17),
-                    ],
+                    [app_icon, app_name, ft.Text(f"Versi {config.APP_VERSION}", size=17)],
                     spacing=0,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                    alignment=ft.MainAxisAlignment.CENTER,
+                    alignment=ft.MainAxisAlignment.CENTER
                 ),
                 alignment=ft.Alignment.CENTER,
-                expand=True,
+                expand=True
             ),
-            footer_text,
+            footer_text
         ],
-        expand=True,
+        expand=True
     )
 
     body_content = ft.Container(content=home_default_content, expand=True)
@@ -185,7 +177,6 @@ def home_view(page: ft.Page):
                 alignment=ft.Alignment.CENTER,
                 expand=True,
             )
-
         body_content.update()
 
     nav_destinations = [
@@ -201,9 +192,9 @@ def home_view(page: ft.Page):
             destinations=nav_destinations,
             selected_index=0,
             on_change=on_nav_change,
-            indicator_color=ft.Colors.BLUE_900,
+            indicator_color=ft.Colors.BLUE_900
         ),
-        width=390,
+        width=390
     )
 
     main_content = ft.Column(
@@ -215,21 +206,21 @@ def home_view(page: ft.Page):
                             content=ft.Row(
                                 [status_dot, user_profile],
                                 alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
-                                vertical_alignment=ft.CrossAxisAlignment.CENTER,
+                                vertical_alignment=ft.CrossAxisAlignment.CENTER
                             ),
-                            padding=ft.Padding(left=10, top=10, right=10, bottom=10),
+                            padding=ft.Padding(left=10, top=10, right=10, bottom=10)
                         ),
-                        ft.Divider(height=1, thickness=0.5, color=ft.Colors.WHITE_70),
+                        ft.Divider(height=1, thickness=0.5, color=ft.Colors.WHITE_70)
                     ],
-                    spacing=0,
+                    spacing=0
                 )
             ),
             body_content,
-            my_navbar,
+            my_navbar
         ],
         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        expand=True,
+        expand=True
     )
 
     main_container = ft.Container(content=main_content, width=390, height=844)
@@ -242,9 +233,9 @@ def home_view(page: ft.Page):
                 width=390,
                 height=844,
                 gapless_playback=True,
-                color=ft.Colors.GREY_800,
+                color=ft.Colors.GREY_800
             ),
-            main_container,
+            main_container
         ]
     )
 
@@ -254,9 +245,7 @@ def home_view(page: ft.Page):
         controls=[
             ft.SafeArea(
                 expand=True,
-                content=ft.Container(
-                    content=main_layout, alignment=ft.Alignment.CENTER, expand=True
-                ),
+                content=ft.Container(content=main_layout, alignment=ft.Alignment.CENTER, expand=True)
             )
-        ],
+        ]
     )

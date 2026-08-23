@@ -9,7 +9,7 @@ class RouteGuard:
         self,
         builder: Callable[[ft.Page], ft.View],
         protected: bool = False,
-        guest_only: bool = False,
+        guest_only: bool = False
     ):
         self.builder = builder
         self.protected = protected
@@ -28,7 +28,7 @@ class Router:
         path: str,
         builder: Callable[[ft.Page], ft.View],
         protected: bool = False,
-        guest_only: bool = False,
+        guest_only: bool = False
     ):
         self.routes[path] = RouteGuard(builder, protected, guest_only)
 

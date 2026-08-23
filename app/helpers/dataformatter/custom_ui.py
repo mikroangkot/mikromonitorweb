@@ -11,9 +11,9 @@ class FormatUI:
                 message.title(),
                 color=ft.Colors.WHITE,
                 weight=ft.FontWeight.BOLD,
-                text_align=ft.TextAlign.CENTER,
+                text_align=ft.TextAlign.CENTER
             ),
-            bgcolor=ft.Colors.with_opacity(0.5, color_value),
+            bgcolor=ft.Colors.with_opacity(0.5, color_value)
         )
         page.overlay.append(snack_bar)
         snack_bar.open = True

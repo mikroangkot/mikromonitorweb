@@ -67,9 +67,7 @@ class UserActivity:
                         await asyncio.to_thread(_delete_local, record_id)
                     return True
                 else:
-                    DataFormatter.log_msg(
-                        f"{response.status_code}", tag="postuseractivity_error"
-                    )
+                    DataFormatter.log_msg(f"{response.status_code}", tag="postuseractivity_error")
         except Exception as err:
             DataFormatter.log_msg(f"{err}", tag="postuseractivity_error")
         return False

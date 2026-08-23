@@ -30,9 +30,7 @@ class UserActivitySync:
             return {"status": "success", "synced": 0, "failed": 0}
         timeout = httpx.Timeout(10.0, connect=5.0)
         query_params = {"page": "useractivity"}
-
         async with httpx.AsyncClient(follow_redirects=True, timeout=timeout) as client:
-
             async def _send_record(record: dict):
                 record_id = record.pop("id")
                 try:
@@ -51,14 +49,10 @@ class UserActivitySync:
                         )
                         return False, record_id
                 except Exception as err:
-                    DataFormatter.log_msg(
-                        f"Exception sync ID {record_id}: {err}", tag="syncpending_error"
-                    )
+                    DataFormatter.log_msg(f"Exception sync ID {record_id}: {err}", tag="syncpending_error")
                     return False, record_id
 
-            results = await asyncio.gather(
-                *[_send_record(rec) for rec in pending_records]
-            )
+            results = await asyncio.gather(*[_send_record(rec) for rec in pending_records])
         synced_ids = [rid for success, rid in results if success]
         failed_count = len(results) - len(synced_ids)
         if synced_ids:

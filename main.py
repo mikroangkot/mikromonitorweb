@@ -10,7 +10,7 @@ from app.views.auth import (
     notfound_404,
     maintenance_503,
     loading,
-    offline,
+    offline
 )
 
 
@@ -29,12 +29,8 @@ async def main(page: ft.Page):
     storage = DataFormatter()
     profile = page.session.store.get("current_user") or {}
     user_name = profile.get("nama", "-")
-
-    geo = ftg.Geolocator(
-        configuration=ftg.GeolocatorConfiguration(
-            accuracy=ftg.GeolocatorPositionAccuracy.HIGH
-        )
-    )
+    geo = ftg.Geolocator(configuration=ftg.GeolocatorConfiguration(accuracy=ftg.GeolocatorPositionAccuracy.HIGH))
+    app_router = router.Router(page)
 
     def close_dialog_exit(e):
         page.pop_dialog()
@@ -42,14 +38,10 @@ async def main(page: ft.Page):
     async def confirm_exit(e):
         page.pop_dialog()
         page.navigate("/loading")
-
         try:
             await Api.post_user_activity(user_name, "Signout")
         except Exception as err:
-            DataFormatter.log_msg(
-                "koneksi internet bermasalah", tag="postuseractivity_error"
-            )
-
+            DataFormatter.log_msg("koneksi internet bermasalah", tag="postuseractivity_error")
         page.session.store.remove("current_user")
         await storage.remove("current_user")
         await storage.remove("token")
@@ -60,24 +52,22 @@ async def main(page: ft.Page):
             "Confirm",
             weight=ft.FontWeight.BOLD,
             size=14,
-            color=ft.Colors.YELLOW_600,
+            color=ft.Colors.YELLOW_600
         ),
         content=ft.Text(
             "Apakah yakin ingin keluar dari aplikasi?",
             size=13,
-            color=ft.Colors.WHITE,
+            color=ft.Colors.WHITE
         ),
         actions=[
             ft.TextButton("Batal", on_click=close_dialog_exit),
-            ft.TextButton("Ya", on_click=confirm_exit),
+            ft.TextButton("Ya", on_click=confirm_exit)
         ],
-        actions_alignment=ft.MainAxisAlignment.END,
+        actions_alignment=ft.MainAxisAlignment.END
     )
 
     async def confirm_exit_log(e):
         page.show_dialog(dialog_exit)
-
-    app_router = router.Router(page)
 
     def build_home_view(p: ft.Page):
         h_view = home.home_view(p)
@@ -102,7 +92,6 @@ async def main(page: ft.Page):
         if e.state == "resumed":
             await location.get_current_location(page, geo)
             user_saved = await storage.get("current_user")
-
             if user_saved and not page.session.store.contains_key("current_user"):
                 page.session.store.set("current_user", user_saved)
 
@@ -124,6 +113,5 @@ async def main(page: ft.Page):
         await location.get_current_location(page, geo)
 
     await init_cek()
-
 
 ft.run(main, assets_dir="assets")

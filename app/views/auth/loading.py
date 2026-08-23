@@ -24,6 +24,38 @@ def loading_view(page: ft.Page):
 
     connection.Connectivity(page, on_change=on_network_change)
 
+    loading_default_content = ft.Stack(
+        [
+            ft.Container(
+                content=ft.Column(
+                    controls=[
+                        ft.Column(
+                            [
+                                ft.Container(
+                                    ft.Column(
+                                        controls=[
+                                            ft.ProgressRing(width=45, height=45, color=ft.Colors.BLUE_400),
+                                            ft.Text("Please wait...", size=13, color=ft.Colors.WHITE)
+                                        ],
+                                        horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                                        alignment=ft.MainAxisAlignment.CENTER,
+                                        spacing=15
+                                    )
+                                )
+                            ]
+                        )
+                    ],
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    spacing=0,
+                    expand=True
+                )
+            )
+        ]
+    )
+
+    body_content = ft.Container(content=loading_default_content, expand=True)
+
     main_content = ft.Column(
         [
             ft.Container(
@@ -41,15 +73,7 @@ def loading_view(page: ft.Page):
                     spacing=0
                 )
             ),
-            ft.Column(
-                controls=[
-                    ft.ProgressRing(width=45, height=45, color=ft.Colors.BLUE_400),
-                    ft.Text("Please wait...", size=13, color=ft.Colors.WHITE)
-                ],
-                horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-                alignment=ft.MainAxisAlignment.CENTER,
-                spacing=15
-            )
+            body_content
         ],
         alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
         horizontal_alignment=ft.CrossAxisAlignment.CENTER,
@@ -79,9 +103,7 @@ def loading_view(page: ft.Page):
         controls=[
             ft.SafeArea(
                 expand=True,
-                content=ft.Container(
-                    content=main_layout, alignment=ft.Alignment.CENTER, expand=True
-                )
+                content=ft.Container(content=main_layout, alignment=ft.Alignment.CENTER, expand=True)
             )
         ]
     )

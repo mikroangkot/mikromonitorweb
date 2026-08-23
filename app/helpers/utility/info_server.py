@@ -33,17 +33,11 @@ async def info_server(page: ft.Page):
                         page.pop_dialog()
 
                     banner = ft.Banner(
-                        leading=ft.Icon(
-                            ft.Icons.INFO_OUTLINED, color=ft.Colors.PRIMARY
-                        ),
+                        leading=ft.Icon(ft.Icons.INFO_OUTLINED, color=ft.Colors.PRIMARY),
                         content=ft.Text(message, size=11),
-                        actions=[
-                            ft.TextButton(
-                                ft.Text("Dismiss", size=11), on_click=close_banner
-                            )
-                        ],
+                        actions=[ft.TextButton(ft.Text("Dismiss", size=11), on_click=close_banner)],
                         bgcolor=ft.Colors.SURFACE_CONTAINER_LOW,
-                        open=True,
+                        open=True
                     )
                     page.show_dialog(banner)
             if not page.session.store.contains_key("info_app"):
@@ -63,7 +57,5 @@ async def info_server(page: ft.Page):
     if user_saved:
         page.session.store.set("current_user", user_saved)
     if getattr(page, "server_status", "open") != "close":
-        initial_route = (
-            "/home" if page.session.store.contains_key("current_user") else "/signin"
-        )
+        initial_route = ("/home" if page.session.store.contains_key("current_user") else "/signin")
         page.navigate(initial_route)

@@ -10,14 +10,12 @@ class InfoApp:
         try:
             timeout = httpx.Timeout(10.0, connect=5.0)
             query_params = {"page": "infoserver"}
-
             async with httpx.AsyncClient(
                 follow_redirects=True, timeout=timeout
             ) as client:
                 response = await client.post(
                     url=config.API_URL, headers=config.HEADERS, params=query_params
                 )
-
                 if response.is_success:
                     try:
                         ress_json = response.json()
@@ -32,7 +30,6 @@ class InfoApp:
                         f"http error: {response.status_code}", tag="appinfo_error"
                     )
                     return None
-
         except Exception as err:
             DataFormatter.log_msg(f"{err}", tag="infoapp_error")
             return None

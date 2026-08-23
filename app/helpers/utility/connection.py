@@ -25,13 +25,11 @@ class Connectivity:
 
     async def _process_status(self, connectivity_list):
         is_online = ft.ConnectivityType.NONE not in connectivity_list
-
         if self.on_change:
             if inspect.iscoroutinefunction(self.on_change):
                 await self.on_change(is_online, connectivity_list)
             else:
                 self.on_change(is_online, connectivity_list)
-
         try:
             self.page.update()
         except Exception:

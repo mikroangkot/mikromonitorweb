@@ -9,7 +9,6 @@ class SigninApp:
     async def signin(cls, email, password):
         try:
             timeout = httpx.Timeout(10.0, connect=5.0)
-
             async with httpx.AsyncClient(
                 follow_redirects=True, timeout=timeout
             ) as client:
