@@ -77,7 +77,7 @@ def unit_view(page: ft.Page):
 			)
 			if save_path:
 				DataFormatter.show_snackbar(page, "Data berhasil disimpan...!!!", "GREEN_900")
-				page.run_task(Api.useractivity, username, f"Download Data {search_input.value}")
+				page.run_task(Api.useractivity, username, f"Download Data Unit {search_input.value}")
 				btn_export.visible = False
 			else:
 				DataFormatter.show_snackbar(page, "Penyimpanan dibatalkan...!!!", "YELLOW_900")
