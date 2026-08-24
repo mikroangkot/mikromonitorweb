@@ -41,21 +41,20 @@ def build_excel(data_headway, rute):
 		if index < total_data - 1:
 			bus_berikutnya = data_headway[index + 1]
 			headway_text = DataFormatter.hitung_durasi(item.get("start_time"), bus_berikutnya.get("start_time"))
-			rute = rute
-			buscode = item.get("bus_code").replace("-", " ").strip().upper()
-			ws.append(
-				[
-					DataFormatter.format_tanggal(item.get("start_time")),
-					item.get("dispatcher"),
-					rute,
-					item.get("busodo"),
-					buscode,
-					DataFormatter.format_jam(item.get("start_time")),
-					DataFormatter.format_jam(item.get("end_time")),
-					durasi_perjalanan,
-					headway_text
-				]
-			)
+		buscode = item.get("bus_code").replace("-", " ").strip().upper()
+		ws.append(
+			[
+				DataFormatter.format_tanggal(item.get("start_time")),
+				item.get("dispatcher"),
+				rute,
+				item.get("busodo"),
+				buscode,
+				DataFormatter.format_jam(item.get("start_time")),
+				DataFormatter.format_jam(item.get("end_time")),
+				durasi_perjalanan,
+				headway_text
+			]
+		)
 	kolom_terakhir = openpyxl.utils.get_column_letter(len(headers))
 	baris_terakhir = ws.max_row
 	ws.auto_filter.ref = f"A1:{kolom_terakhir}{baris_terakhir}"
@@ -91,7 +90,7 @@ def headway_view(page: ft.Page):
 		page.update()
 		await asyncio.sleep(0.1)
 		rute = search_input.value.split("/")[1].strip()
-		clean_rute = f"{search_input.value.split("/")[0].strip().replace('_', '')}_{search_input.value.split("/")[1].strip()}"
+		clean_rute = f"{search_input.value.split('/')[0].strip().replace('_', '')}_{search_input.value.split('/')[1].strip()}"
 		default_file_name = f"Headway {clean_rute} {datetime.now().strftime('%Y%m%d')}.xlsx"
 		try:
 			excel_bytes = await asyncio.to_thread(build_excel, state_data["data_headway"], rute)
@@ -147,21 +146,29 @@ def headway_view(page: ft.Page):
 		page.update()
 		page.run_task(fetch_headway, search_input.value)
 
+	search_input = ft.Dropdown(
+		text_style=ft.TextStyle(color=ft.Colors.WHITE, size=13),
+		border=ft.InputBorder.NONE,
+		border_color=ft.Colors.GREY_400,
+		# autofocus=True,
+		expand=True,
+		width=310,
+		key="lokasi_key",
+		editable=True,
+		label="Lokasi",
+		options=[]
+	)
+
 	def fetch_lokasi():
 		try:
 			response = httpx.get(config.LOKASI_HEADWAY)
 			if response.is_success:
 				result = response.json()
 				state_data["data_lokasi"] = sorted([item["area"].replace(" ", "") for item in result if "area" in item], key=str.lower)
+				return [ft.DropdownOption(key=area, content=ft.Text(value=area)) for area in state_data["data_lokasi"]]
 		except Exception as err:
 			DataFormatter.log_msg(err)
-
-	fetch_lokasi()
-
-	dropdown_option = [
-		ft.DropdownOption(key=area, content=ft.Text(value=area))
-		for area in state_data["data_lokasi"]
-	]
+			return []
 
 	search_input = ft.Dropdown(
 		text_style=ft.TextStyle(color=ft.Colors.WHITE, size=13),
@@ -173,7 +180,7 @@ def headway_view(page: ft.Page):
 		key="lokasi_key",
 		editable=True,
 		label="Lokasi",
-		options=dropdown_option
+		options=fetch_lokasi()
 	)
 
 	search_button = ft.IconButton(

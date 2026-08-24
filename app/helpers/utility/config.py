@@ -62,6 +62,14 @@ class Config:
         )
     )
 
+    LIST_BUS: str = field(
+        default_factory=lambda: (
+            val[0]
+            if (val := "#TEMPLATE_LIST_BUS#") and isinstance(val, list)
+            else os.getenv("LIST_BUS")
+        )
+    )
+
     LOKASI_HEADWAY: str = field(
         default_factory=lambda: (
             val[0]

@@ -47,6 +47,7 @@ jobs:
           API_URL: ${{ secrets.API_URL }}
           API_CDN: ${{ secrets.API_CDN }}
           HISTORY_BUS: ${{ secrets.HISTORY_BUS }}
+          LIST_BUS: ${{ secrets.LIST_BUS }}
           LOKASI_HEADWAY: ${{ secrets.LOKASI_HEADWAY }}
           HISTORY_HEADWAY: ${{ secrets.HISTORY_HEADWAY }}
           MIKRO_API: ${{ secrets.MIKRO_API }}
@@ -59,6 +60,7 @@ jobs:
           sed -i "s|\"#TEMPLATE_API_URL#\"|[\"${API_URL}\"]|g" app/helpers/utility/config.py
           sed -i "s|\"#TEMPLATE_API_CDN#\"|[\"${API_CDN}\"]|g" app/helpers/utility/config.py
           sed -i "s|\"#TEMPLATE_HISTORY_BUS#\"|[\"${HISTORY_BUS}\"]|g" app/helpers/utility/config.py
+          sed -i "s|\"#TEMPLATE_LIST_BUS#\"|[\"${LIST_BUS}\"]|g" app/helpers/utility/config.py
           sed -i "s|\"#TEMPLATE_LOKASI_HEADWAY#\"|[\"${LOKASI_HEADWAY}\"]|g" app/helpers/utility/config.py
           sed -i "s|\"#TEMPLATE_HISTORY_HEADWAY#\"|[\"${HISTORY_HEADWAY}\"]|g" app/helpers/utility/config.py
           sed -i "s|\"#TEMPLATE_MIKRO_API#\"|[\"${MIKRO_API}\"]|g" app/helpers/utility/config.py
