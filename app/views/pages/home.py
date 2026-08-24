@@ -167,10 +167,10 @@ def home_view(page: ft.Page):
             body_content.content = Pages.unit_view(page)
         elif selected_label == "KM Baku":
             body_content.content = Pages.kmbaku_view(page)
-        elif selected_label == "History":
-            body_content.content = Pages.history_view(page)
         elif selected_label == "Headway":
             body_content.content = Pages.headway_view(page)
+        elif selected_label == "History":
+            body_content.content = Pages.history_view(page)
         else:
             body_content.content = ft.Container(
                 content=ft.Text(f"Halaman {selected_label}", size=20),
@@ -183,8 +183,8 @@ def home_view(page: ft.Page):
         ft.NavigationBarDestination(icon=ft.Icons.HOME, label="Home"),
         ft.NavigationBarDestination(icon=ft.Icons.DIRECTIONS_BUS, label="Unit"),
         ft.NavigationBarDestination(icon=ft.Icons.SPEED, label="KM Baku"),
-        ft.NavigationBarDestination(icon=ft.Icons.HISTORY, label="History"),
-        ft.NavigationBarDestination(icon=ft.Icons.AV_TIMER, label="Headway")
+        ft.NavigationBarDestination(icon=ft.Icons.AV_TIMER, label="Headway"),
+        ft.NavigationBarDestination(icon=ft.Icons.HISTORY, label="History")
     ]
 
     my_navbar = ft.Container(

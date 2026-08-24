@@ -55,37 +55,29 @@ def unit_view(page: ft.Page):
 	status_text = ft.Text(value="")
 	rekapan = ft.Container(content=ft.Row(controls=[status_text]))
 	daftar_konten = ft.ListView(spacing=1, padding=1, expand=True)
+	share = ft.Share()
 
-	async def export_excel(e):
+	async def share_excel(e):
 		if not state_data["data_unit"]:
-			DataFormatter.show_snackbar(page, "Tidak ada data untuk di export...!!!", "YELLOW_900")
+			DataFormatter.show_snackbar(page, "Tidak ada data...!!!", "YELLOW_900")
 			return None
-		btn_export.disable = True
-		btn_export.icon = None
-		btn_export.content = ft.ProgressRing(width=15, height=15, color=ft.Colors.YELLOW_400)
+		btn_share.disabled = True
+		btn_share.icon = None
+		btn_share.content = ft.ProgressRing(width=15, height=15, color=ft.Colors.YELLOW_400)
 		page.update()
 		await asyncio.sleep(0.1)
-		default_file_name = f"Data {search_input.value}.xlsx"
+		default_file_name = f"Data Unit {search_input.value}.xlsx"
 		try:
 			excel_bytes = await asyncio.to_thread(build_excel, state_data["data_unit"])
-			save_path = await ft.FilePicker().save_file(
-				dialog_title="Save to Excel",
-				file_name=default_file_name,
-				file_type=ft.FilePickerFileType.CUSTOM,
-				allowed_extensions=["xlsx"],
-				src_bytes=excel_bytes
-			)
-			if save_path:
-				DataFormatter.show_snackbar(page, "Data berhasil disimpan...!!!", "GREEN_900")
-				page.run_task(Api.useractivity, username, f"Download Data Unit {search_input.value}")
-				btn_export.visible = False
-			else:
-				DataFormatter.show_snackbar(page, "Penyimpanan dibatalkan...!!!", "YELLOW_900")
+			excel_file = ft.ShareFile.from_bytes(excel_bytes, name=default_file_name, mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+			await share.share_files([excel_file], text=default_file_name)
+			page.run_task(Api.useractivity, username, f"Share {default_file_name}")
+			btn_share.visible = False
 		except Exception as err:
-			DataFormatter.show_snackbar(page, f"Gagal menyimpan file: {err}", "YELLOW_900")
-		btn_export.disabled = False
-		btn_export.icon = ft.Icons.SAVE_AS
-		btn_export.content = ft.Text("Export to Excel")
+			DataFormatter.show_snackbar(page, f"Failed Share Data: {err}", "YELLOW_900")
+		btn_share.disabled = False
+		btn_share.icon = ft.Icons.SHARE
+		btn_share.content = ft.Text("Share Data")
 		page.update()
 
 	api_result_container = ft.Column(
@@ -155,27 +147,27 @@ def unit_view(page: ft.Page):
 	)
 
 	search_bar = ft.Container(
-		ft.Row(
+		content=ft.Row(
 			controls=[search_input, search_button],
 			alignment=ft.MainAxisAlignment.START,
-			vertical_alignment=ft.CrossAxisAlignment.CENTER,
-			margin=ft.Margin(top=3)
-		)
+			vertical_alignment=ft.CrossAxisAlignment.CENTER
+		),
+		margin=ft.Margin(top=3)
 	)
 
-	btn_export = ft.Button(
-		content=ft.Text("Export to Excel", size=13),
+	btn_share = ft.Button(
+		content=ft.Text("Share Data", size=13),
 		width=310,
 		style=ft.ButtonStyle(color=ft.Colors.WHITE, bgcolor=ft.Colors.GREEN_600),
-		icon=ft.Icons.SAVE_AS,
-		on_click=export_excel,
+		icon=ft.Icons.SHARE,
+		on_click=share_excel,
 		visible=False
 	)
 
 	async def fetch_dataunit(kode):
 		daftar_konten.controls.clear()
 		status_text.value = ""
-		btn_export.visible = False
+		btn_share.visible = False
 		loading_spinner.visible = True
 		page.update()
 		timeout = httpx.Timeout(120.0, connect=10.0)
@@ -221,7 +213,7 @@ def unit_view(page: ft.Page):
 								spacing=0.5
 							)
 							daftar_konten.controls.append(item_box)
-						btn_export.visible = True
+						btn_share.visible = True
 						page.run_task(Api.useractivity, username, f"View Data Unit {kode}")
 					else:
 						DataFormatter.show_snackbar(page, "Data tidak ditemukan...!!!", "YELLOW_900")
@@ -243,7 +235,7 @@ def unit_view(page: ft.Page):
 					search_bar,
 					rekapan,
 					ft.Container(content=api_result_container, expand=True),
-					btn_export
+					btn_share
 				],
 				horizontal_alignment=ft.CrossAxisAlignment.CENTER,
 				expand=True

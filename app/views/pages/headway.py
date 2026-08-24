@@ -72,11 +72,12 @@ def build_excel(data_headway, rute):
 def headway_view(page: ft.Page):
 	profile = page.session.store.get("current_user")
 	username = profile.get("nama", "-")
-	state_data = {"data_headway": [], "data_lokasi": []}
+	state_data = {"data_headway": []}
 	status_text = ft.Text(value="")
 	rekapan = ft.Container(content=ft.Row(controls=[status_text]))
 	daftar_konten = ft.ListView(spacing=1, padding=1, expand=True)
 	share = ft.Share()
+	pengendapan = []
 
 	async def share_excel(e):
 		if not state_data["data_headway"]:
@@ -89,16 +90,15 @@ def headway_view(page: ft.Page):
 		await asyncio.sleep(0.1)
 		rute = search_input.value.split("/")[1].strip()
 		clean_rute = f"{search_input.value.split('/')[0].strip().replace('_', '')}_{search_input.value.split('/')[1].strip()}"
-		default_file_name = f"Headway {clean_rute} {datetime.now().strftime('%Y%m%d')}.xlsx"
+		default_file_name = f"Data Headway {clean_rute} {datetime.now().strftime('%Y%m%d')}.xlsx"
 		try:
 			excel_bytes = await asyncio.to_thread(build_excel, state_data["data_headway"], rute)
 			excel_file = ft.ShareFile.from_bytes(excel_bytes, name=default_file_name, mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-			await share.share_files([excel_file], text=f"Data Headway {search_input.value} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
-			page.run_task(Api.useractivity, username, f"Share Data Headway {search_input.value} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
+			await share.share_files([excel_file], text=default_file_name)
+			page.run_task(Api.useractivity, username, f"Share {default_file_name}")
 			btn_share.visible = False
 		except Exception as err:
 			DataFormatter.show_snackbar(page, f"Failed Share Data: {err}", "YELLOW_900")
-			DataFormatter.log_msg(err)
 		btn_share.disabled = False
 		btn_share.icon = ft.Icons.SHARE
 		btn_share.content = ft.Text("Share Data")
@@ -134,38 +134,77 @@ def headway_view(page: ft.Page):
 		actions_alignment=ft.MainAxisAlignment.END
 	)
 
-	def search_click(e):
-		if not search_input.value:
+	async def open_search_view(e):
+		if hasattr(search_input, "open_view_async"):
+			await search_input.open_view_async()
+		else:
+			await search_input.open_view()
+
+	async def select_pengendapan(e):
+		selected_value = e.control.data
+		search_input.value = selected_value
+		if hasattr(search_input, "close_view_async"):
+			await search_input.close_view_async(selected_value)
+		else:
+			await search_input.close_view(selected_value)
+		page.update()
+		page.run_task(fetch_headway, selected_value)
+
+	def populate_search_controls(filter_text=""):
+		filtered = [
+			b for b in pengendapan
+			if filter_text.upper() in b.upper()
+		] if filter_text else pengendapan
+
+		search_input.controls = [
+			ft.ListTile(
+				title=ft.Text(entry),
+				data=entry,
+				on_click=select_pengendapan
+			) for entry in filtered[:50]
+		]
+
+	async def handle_change(e):
+		val = e.data.upper() if e.data else ""
+		populate_search_controls(val)
+		search_input.update()
+		if val:
+			if hasattr(search_input, "open_view_async"):
+				await search_input.open_view_async()
+			else:
+				await search_input.open_view()
+
+	async def search_click(e):
+		entry = search_input.value.strip().upper() if search_input.value else ""
+		if not entry:
 			page.show_dialog(dialog_popup)
 			status_text.value = ""
 			daftar_konten.controls.clear()
 			page.update()
 			return None
+		if hasattr(search_input, "close_view_async"):
+			await search_input.close_view_async(entry)
+		else:
+			page.run_task(search_input.close_view, entry)
 		page.update()
-		page.run_task(fetch_headway, search_input.value)
+		page.run_task(fetch_headway, entry)
 
-	def fetch_lokasi():
-		try:
-			response = httpx.get(config.LOKASI_HEADWAY)
-			if response.is_success:
-				result = response.json()
-				state_data["data_lokasi"] = sorted([item["area"].replace(" ", "") for item in result if "area" in item], key=str.lower)
-				return [ft.DropdownOption(key=area, content=ft.Text(value=area)) for area in state_data["data_lokasi"]]
-		except Exception as err:
-			DataFormatter.log_msg(err)
-			return []
-
-	search_input = ft.Dropdown(
-		text_style=ft.TextStyle(color=ft.Colors.WHITE, size=13),
-		border=ft.InputBorder.NONE,
-		border_color=ft.Colors.GREY_400,
+	search_input = ft.SearchBar(
+		bar_hint_text="Cari Pengendapan...",
+		view_hint_text="Ketik Lokasi Pengendapan...",
+		bar_text_style=ft.TextStyle(color=ft.Colors.GREY_400, size=13),
+		bar_leading=ft.Icon(ft.Icons.AV_TIMER, color=ft.Colors.GREY_400),
+		bar_shadow_color=ft.Colors.BLUE_400,
+		bar_bgcolor=ft.Colors.TRANSPARENT,
+		bar_overlay_color=ft.Colors.TRANSPARENT,
+		bar_border_side=ft.BorderSide(width=0, color=ft.Colors.TRANSPARENT),
 		autofocus=True,
+		bar_elevation=0,
+		controls=[],
 		expand=True,
-		width=310,
-		key="lokasi_key",
-		editable=True,
-		label="Lokasi",
-		options=fetch_lokasi()
+		on_change=handle_change,
+		on_submit=search_click,
+		on_tap=open_search_view
 	)
 
 	search_button = ft.IconButton(
@@ -176,12 +215,12 @@ def headway_view(page: ft.Page):
 	)
 
 	search_bar = ft.Container(
-		ft.Row(
+		content=ft.Row(
 			controls=[search_input, search_button],
 			alignment=ft.MainAxisAlignment.START,
 			vertical_alignment=ft.CrossAxisAlignment.CENTER,
-			margin=ft.Margin(top=3)
-		)
+		),
+		margin=ft.Margin(top=-1)
 	)
 
 	btn_share = ft.Button(
@@ -193,19 +232,39 @@ def headway_view(page: ft.Page):
 		visible=False
 	)
 
+	async def fetch_lokasi():
+		nonlocal pengendapan
+		try:
+			async with httpx.AsyncClient() as client:
+				response = await client.get(config.LOKASI_HEADWAY)
+				if response.is_success:
+					result = response.json()
+					endapan = []
+					for item in result:
+						if isinstance(item, dict) and "area" in item and item["area"]:
+							parts = item["area"].split("/")
+							wilayah = f"{parts[0].strip()}/{parts[1].strip()}"
+							endapan.append(wilayah)
+					pengendapan = sorted(list(set(endapan)), key=str.lower)
+					populate_search_controls()
+					search_input.update()
+					page.update()
+		except Exception as err:
+			DataFormatter.log_msg(err)
+
+	page.run_task(fetch_lokasi)
+
 	async def fetch_headway(input_value: str):
 		daftar_konten.controls.clear()
 		status_text.value = ""
 		btn_share.visible = False
 		loading_spinner.visible = True
 		page.update()
-
 		if "/" not in input_value:
 			loading_spinner.visible = False
 			DataFormatter.show_snackbar(page, "Gunakan format: Lokasi/Rute", "YELLOW_900")
 			page.update()
 			return None
-
 		parts = input_value.split("/")
 		dispatcher = parts[0].strip()
 		rute = parts[1].strip()
