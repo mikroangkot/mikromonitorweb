@@ -3,8 +3,6 @@ import httpx
 import io
 import asyncio
 import openpyxl
-import os
-import tempfile
 from openpyxl.styles import Font, PatternFill, Alignment
 from datetime import datetime
 from app.helpers.utility import config
@@ -145,19 +143,6 @@ def headway_view(page: ft.Page):
 			return None
 		page.update()
 		page.run_task(fetch_headway, search_input.value)
-
-	search_input = ft.Dropdown(
-		text_style=ft.TextStyle(color=ft.Colors.WHITE, size=13),
-		border=ft.InputBorder.NONE,
-		border_color=ft.Colors.GREY_400,
-		# autofocus=True,
-		expand=True,
-		width=310,
-		key="lokasi_key",
-		editable=True,
-		label="Lokasi",
-		options=[]
-	)
 
 	def fetch_lokasi():
 		try:
