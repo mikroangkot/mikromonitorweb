@@ -3,6 +3,8 @@ import httpx
 import io
 import asyncio
 import openpyxl
+import os
+import tempfile
 from openpyxl.styles import Font, PatternFill, Alignment
 from datetime import datetime
 from app.helpers.utility import config
@@ -84,29 +86,23 @@ def headway_view(page: ft.Page):
 		if not state_data["data_headway"]:
 			DataFormatter.show_snackbar(page, "Tidak ada data untuk di export...!!!", "YELLOW_900")
 			return None
-		btn_share.disable = True
+		btn_share.disabled = True
 		btn_share.icon = None
 		btn_share.content = ft.ProgressRing(width=15, height=15, color=ft.Colors.YELLOW_400)
 		page.update()
 		await asyncio.sleep(0.1)
 		rute = search_input.value.split("/")[1].strip()
-		default_file_name = f"Headway {search_input.value} {datetime.now().strftime('%Y%m%d')}.xlsx"
+		clean_rute = f"{search_input.value.split("/")[0].strip().replace('_', '')}_{search_input.value.split("/")[1].strip()}"
+		default_file_name = f"Headway {clean_rute} {datetime.now().strftime('%Y%m%d')}.xlsx"
 		try:
 			excel_bytes = await asyncio.to_thread(build_excel, state_data["data_headway"], rute)
-			excel_file = ft.ShareFile.from_bytes(
-				excel_bytes,
-				mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-				name=default_file_name
-			)
-			result = await share.share_files([excel_file], text=f"Data Headway {search_input.value} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
-			if result and result.status:
-				DataFormatter.show_snackbar(page, "Share Data Sukses...!!!", "GREEN_900")
-				page.run_task(Api.useractivity, username, f"Share Data Headway {search_input.value} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
-				btn_share.visible = False
-			else:
-				DataFormatter.show_snackbar(page, "Cancel Share Data...!!!", "YELLOW_900")
+			excel_file = ft.ShareFile.from_bytes(excel_bytes, name=default_file_name, mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
+			await share.share_files([excel_file], text=f"Data Headway {search_input.value} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
+			page.run_task(Api.useractivity, username, f"Share Data Headway {search_input.value} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
+			btn_share.visible = False
 		except Exception as err:
 			DataFormatter.show_snackbar(page, f"Failed Share Data: {err}", "YELLOW_900")
+			DataFormatter.log_msg(err)
 		btn_share.disabled = False
 		btn_share.icon = ft.Icons.SHARE
 		btn_share.content = ft.Text("Share Data")
