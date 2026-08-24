@@ -75,8 +75,7 @@ def build_excel(data_headway, rute):
 def headway_view(page: ft.Page):
 	profile = page.session.store.get("current_user")
 	username = profile.get("nama", "-")
-	state_data = {"data_headway": []}
-	state_data = {"data_lokasi": []}
+	state_data = {"data_headway": [], "data_lokasi": []}
 	status_text = ft.Text(value="")
 	rekapan = ft.Container(content=ft.Row(controls=[status_text]))
 	daftar_konten = ft.ListView(spacing=1, padding=1, expand=True)
