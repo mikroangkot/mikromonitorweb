@@ -266,7 +266,7 @@ def history_view(page: ft.Page):
 		btn_share.visible = False
 		loading_spinner.visible = True
 		page.update()
-		timeout = httpx.Timeout(120.0, connect=10.0)
+		timeout = httpx.Timeout(180.0, connect=10.0)
 		transport = httpx.AsyncHTTPTransport(retries=3)
 		try:
 			async with httpx.AsyncClient(timeout=timeout, transport=transport) as client:
@@ -326,8 +326,11 @@ def history_view(page: ft.Page):
 				else:
 					DataFormatter.show_snackbar(page, "Gagal mengambil data...!!!", "YELLOW_900")
 					return None
+		except httpx.TimeoutException:
+			DataFormatter.show_snackbar(page, "Request timout error", "YELLOW_900")
+			return None
 		except Exception as err:
-			DataFormatter.show_snackbar(page, f"{err}", "YELLOW_900")
+			DataFormatter.show_snackbar(page, f"Internal Server Error: {err}", "YELLOW_900")
 			return None
 		finally:
 			loading_spinner.visible = False
