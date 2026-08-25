@@ -18,15 +18,9 @@ async def get_current_location(page: ft.Page, geo: ftg.Geolocator):
         DataFormatter.log_msg(f"{ip_err}", tag="ipaddress_error")
     try:
         status = await geo.get_permission_status()
-        if (
-            status.value in ["denied", "unknown"]
-            or status == ftg.GeolocatorPermissionStatus.DENIED
-        ):
+        if (status.value in ["denied", "unknown"] or status == ftg.GeolocatorPermissionStatus.DENIED):
             result = await geo.request_permission()
-            if (
-                result.value in ["denied", "deniedForever"]
-                or result == ftg.GeolocatorPermissionStatus.DENIED
-            ):
+            if (result.value in ["denied", "deniedForever"] or result == ftg.GeolocatorPermissionStatus.DENIED):
                 DataFormatter.show_snackbar(page, "Ijin ditolak, silahkan aktifkan di pengaturan Android", "YELLOW_900")
                 await geo.open_app_settings()
                 page.update()

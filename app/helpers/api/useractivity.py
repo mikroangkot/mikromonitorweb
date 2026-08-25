@@ -24,7 +24,6 @@ class UserActivity:
             "ip_address": ip_address,
             "lat_long": lat_long,
         }
-
         def _insert_local() -> Optional[int]:
             try:
                 with sqlite3.connect(cls.DB_NAME) as conn:
@@ -41,29 +40,19 @@ class UserActivity:
             except sqlite3.Error as err:
                 DataFormatter.log_msg(f"{err}", tag="sqlite_error")
                 return None
-
         record_id = await asyncio.to_thread(_insert_local)
         try:
             timeout = httpx.Timeout(10.0, connect=5.0)
-            async with httpx.AsyncClient(
-                follow_redirects=True, timeout=timeout
-            ) as client:
-                response = await client.post(
-                    url=config.API_URL,
-                    headers=config.HEADERS,
-                    params=query_params,
-                    json=payload,
-                )
+            async with httpx.AsyncClient(follow_redirects=True, timeout=timeout) as client:
+                response = await client.post(url=config.API_URL, headers=config.HEADERS, params=query_params, json=payload)
                 if response.is_success:
                     if record_id:
-
                         def _delete_local(rid: int):
                             with sqlite3.connect(cls.DB_NAME) as conn:
                                 conn.execute(
                                     "DELETE FROM user_activities WHERE id = ?", (rid,)
                                 )
                                 conn.commit()
-
                         await asyncio.to_thread(_delete_local, record_id)
                     return True
                 else:

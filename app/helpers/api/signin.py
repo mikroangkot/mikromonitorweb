@@ -9,15 +9,8 @@ class SigninApp:
     async def signin(cls, email, password):
         try:
             timeout = httpx.Timeout(10.0, connect=5.0)
-            async with httpx.AsyncClient(
-                follow_redirects=True, timeout=timeout
-            ) as client:
-                response = await client.get(
-                    url=config.API_URL,
-                    headers=config.HEADERS,
-                    params={"page": "signin"},
-                    json={"email": email}
-                )
+            async with httpx.AsyncClient(follow_redirects=True, timeout=timeout) as client:
+                response = await client.post(url=config.API_URL, headers=config.HEADERS, params={"page": "signin"},json={"email": email})
                 if not response.is_success:
                     DataFormatter.log_msg(f"{response.status_code}", tag="signin_error")
                     return None
@@ -33,12 +26,7 @@ class SigninApp:
                 if not DataFormatter.password_bcrypt(input_password, api_password):
                     DataFormatter.log_msg("invalid password", tag="signin_error")
                     return None
-                res_token = await client.get(
-                    url=config.API_URL,
-                    headers=config.HEADERS,
-                    params={"page": "gettoken"},
-                    json={"user": user}
-                )
+                res_token = await client.post(url=config.API_URL, headers=config.HEADERS, params={"page": "gettoken"}, json={"user": user})
                 if res_token.is_success:
                     token_data = res_token.json()
                     if token_data.get("status") == "success":
@@ -52,5 +40,5 @@ class SigninApp:
                     DataFormatter.log_msg("failed call endpoint api", tag="signin_error")
                     return None
         except Exception as err:
-            DataFormatter.log_msg(f"{err}", tag="signin_error")
+            DataFormatter.log_msg(f"internal server error: {err}", tag="signin_error")
             raise err

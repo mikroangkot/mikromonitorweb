@@ -19,45 +19,24 @@ class SignupApp:
             "password": hashed_password,
         }
         try:
-            async with httpx.AsyncClient(
-                follow_redirects=True, timeout=timeout
-            ) as client:
-                response = await client.post(
-                    url=config.API_URL,
-                    headers=config.HEADERS,
-                    params=query_params,
-                    json=payload,
-                )
+            async with httpx.AsyncClient(follow_redirects=True, timeout=timeout) as client:
+                response = await client.post(url=config.API_URL, headers=config.HEADERS, params=query_params, json=payload)
                 response.raise_for_status()
                 result = response.json()
-                return {
-                    "status": result.get("status", "success"),
-                    "message": result.get("message", "Registrasi Sukses...!!!"),
-                }
+                return {"status": result.get("status", "success"), "message": result.get("message", "Registrasi Sukses...!!!")}
         except httpx.HTTPStatusError as err:
             try:
                 server_message = err.response.json().get("message", err.response.text)
             except Exception:
-                server_message = (
-                    err.response.text or f"HTTP Error {err.response.status_code}"
-                )
-            DataFormatter.log_msg(
-                f"Server Error ({err.response.status_code}): {server_message}",
-                tag="registrasi_error",
-            )
+                server_message = (err.response.text or f"HTTP Error {err.response.status_code}")
+            DataFormatter.log_msg(f"Server Error ({err.response.status_code}): {server_message}", tag="registrasi_error")
             return {"status": "error", "message": server_message}
         except httpx.NetworkError as err:
             DataFormatter.log_msg(f"Network Error: {err}", tag="registrasi_error")
-            return {
-                "status": "error",
-                "message": "Koneksi internet terputus atau tidak stabil",
-            }
+            return {"status": "error", "message": "Koneksi internet terputus atau tidak stabil"}
         except httpx.TimeoutException as err:
             DataFormatter.log_msg(f"Timeout Error: {err}", tag="registrasi_error")
-            return {
-                "status": "error",
-                "message": "Waktu koneksi habis. Silakan coba lagi",
-            }
+            return {"status": "error", "message": "Waktu koneksi habis. Silakan coba lagi"}
         except Exception as err:
             DataFormatter.log_msg(f"Unexpected Error: {err}", tag="registrasi_error")
             return {"status": "error", "message": "Terjadi kesalahan tak terduga"}
