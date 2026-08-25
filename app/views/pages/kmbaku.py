@@ -168,8 +168,9 @@ def kmbaku_view(page: ft.Page):
 		loading_spinner.visible = True
 		page.update()
 		timeout = httpx.Timeout(120.0, connect=10.0)
+		transport = httpx.AsyncHTTPTransport(retries=3)
 		try:
-			async with httpx.AsyncClient(follow_redirects=True, timeout=timeout) as client:
+			async with httpx.AsyncClient(follow_redirects=True, timeout=timeout, transport=transport) as client:
 				response = await client.post(
 					url=config.MIKRO_API,
 					headers=config.HEADERS,

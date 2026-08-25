@@ -239,7 +239,9 @@ def history_view(page: ft.Page):
 	async def cari_bus():
 		nonlocal raw_bus_data
 		try:
-			async with httpx.AsyncClient() as client:
+			timeout = httpx.Timeout(20.0, connect=10.0)
+			transport = httpx.AsyncHTTPTransport(retries=3)
+			async with httpx.AsyncClient(timeout=timeout, transport=transport) as client:
 				response = await client.get(config.LIST_BUS)
 				if response.is_success:
 					result = response.json()
@@ -265,8 +267,9 @@ def history_view(page: ft.Page):
 		loading_spinner.visible = True
 		page.update()
 		timeout = httpx.Timeout(120.0, connect=10.0)
+		transport = httpx.AsyncHTTPTransport(retries=3)
 		try:
-			async with httpx.AsyncClient(timeout=timeout) as client:
+			async with httpx.AsyncClient(timeout=timeout, transport=transport) as client:
 				response = await client.get(
 					url=config.HISTORY_BUS,
 					headers=config.HEADERS,

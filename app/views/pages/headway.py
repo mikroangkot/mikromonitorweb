@@ -235,7 +235,9 @@ def headway_view(page: ft.Page):
 	async def fetch_lokasi():
 		nonlocal pengendapan
 		try:
-			async with httpx.AsyncClient() as client:
+			timeout = httpx.Timeout(20.0, connect=10.0)
+			transport = httpx.AsyncHTTPTransport(retries=3)
+			async with httpx.AsyncClient(timeout=timeout, transport=transport) as client:
 				response = await client.get(config.LOKASI_HEADWAY)
 				if response.is_success:
 					result = response.json()
@@ -271,8 +273,9 @@ def headway_view(page: ft.Page):
 		lokasi_awal = dispatcher.split("_")
 		lokasi = lokasi_awal[1].strip()
 		timeout = httpx.Timeout(120.0, connect=10.0)
+		transport = httpx.AsyncHTTPTransport(retries=3)
 		try:
-			async with httpx.AsyncClient(timeout=timeout) as client:
+			async with httpx.AsyncClient(timeout=timeout, transport=transport) as client:
 				response = await client.get(
 					url=config.HISTORY_HEADWAY,
 					headers=config.HEADERS,
