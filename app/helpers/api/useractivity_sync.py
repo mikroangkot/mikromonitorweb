@@ -26,9 +26,10 @@ class UserActivitySync:
         pending_records = await asyncio.to_thread(_fetch_all_pending)
         if not pending_records:
             return {"status": "success", "synced": 0, "failed": 0}
-        timeout = httpx.Timeout(10.0, connect=5.0)
+        timeout = httpx.Timeout(20.0, connect=10.0)
+        transport = httpx.AsyncHTTPTransport(retries=3)
         query_params = {"page": "useractivity"}
-        async with httpx.AsyncClient(follow_redirects=True, timeout=timeout) as client:
+        async with httpx.AsyncClient(follow_redirects=True, timeout=timeout, transport=transport) as client:
             async def _send_record(record: dict):
                 record_id = record.pop("id")
                 try:

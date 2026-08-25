@@ -42,8 +42,9 @@ class UserActivity:
                 return None
         record_id = await asyncio.to_thread(_insert_local)
         try:
-            timeout = httpx.Timeout(10.0, connect=5.0)
-            async with httpx.AsyncClient(follow_redirects=True, timeout=timeout) as client:
+            timeout = httpx.Timeout(20.0, connect=10.0)
+            transport = httpx.AsyncHTTPTransport(retries=3)
+            async with httpx.AsyncClient(follow_redirects=True, timeout=timeout, transport=transport) as client:
                 response = await client.post(url=config.API_URL, headers=config.HEADERS, params=query_params, json=payload)
                 if response.is_success:
                     if record_id:
