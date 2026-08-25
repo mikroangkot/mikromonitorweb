@@ -13,13 +13,13 @@ class InfoApp:
             async with httpx.AsyncClient(
                 follow_redirects=True, timeout=timeout
             ) as client:
-                response = await client.post(
+                response = await client.get(
                     url=config.API_URL, headers=config.HEADERS, params=query_params
                 )
                 if response.is_success:
                     try:
-                        ress_json = response.json()
-                        return ress_json.get("data", [])
+                        result = response.json()
+                        return result.get("data", [])
                     except ValueError:
                         DataFormatter.log_msg(
                             "error server response", tag="appinfo_error"

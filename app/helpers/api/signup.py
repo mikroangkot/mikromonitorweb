@@ -29,10 +29,10 @@ class SignupApp:
                     json=payload,
                 )
                 response.raise_for_status()
-                ress_json = response.json()
+                result = response.json()
                 return {
-                    "status": ress_json.get("status", "success"),
-                    "message": ress_json.get("message", "Registrasi Sukses...!!!"),
+                    "status": result.get("status", "success"),
+                    "message": result.get("message", "Registrasi Sukses...!!!"),
                 }
         except httpx.HTTPStatusError as err:
             try:

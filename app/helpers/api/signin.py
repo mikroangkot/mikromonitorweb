@@ -12,7 +12,7 @@ class SigninApp:
             async with httpx.AsyncClient(
                 follow_redirects=True, timeout=timeout
             ) as client:
-                response = await client.post(
+                response = await client.get(
                     url=config.API_URL,
                     headers=config.HEADERS,
                     params={"page": "signin"},
@@ -33,7 +33,7 @@ class SigninApp:
                 if not DataFormatter.password_bcrypt(input_password, api_password):
                     DataFormatter.log_msg("invalid password", tag="signin_error")
                     return None
-                res_token = await client.post(
+                res_token = await client.get(
                     url=config.API_URL,
                     headers=config.HEADERS,
                     params={"page": "gettoken"},
