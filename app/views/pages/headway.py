@@ -311,7 +311,7 @@ def headway_view(page: ft.Page):
 							)
 							daftar_konten.controls.append(item_box)
 						btn_share.visible = True
-						page.run_task(Api.useractivity, username, f"View Headway Rute {rute}-{lokasi} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
+						page.run_task(Api.useractivity, username, f"View Headway Rute {DataFormatter.format_rute(rute)} Lokasi {lokasi} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
 					else:
 						DataFormatter.show_snackbar(page, "Data tidak ditemukan...!!!", "YELLOW_900")
 						return None
