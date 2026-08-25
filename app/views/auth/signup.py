@@ -76,7 +76,7 @@ def signup_view(page: ft.Page):
     def reset_signup_button():
         signup_button.disabled = False
         signup_button.icon = ft.Icons.FINGERPRINT
-        signup_button.content = ft.Text("Masuk", color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD)
+        signup_button.content = ft.Text("Signup", color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD)
         page.update()
 
     def signup_clicked(e):
@@ -200,7 +200,7 @@ def signup_view(page: ft.Page):
     refresh_captcha_ui()
 
     signup_button = ft.Button(
-        content=ft.Text("Daftar", color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD),
+        content=ft.Text("Signup", color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD),
         width=310,
         height=50,
         bgcolor=ft.Colors.BLUE_600,
@@ -235,7 +235,7 @@ def signup_view(page: ft.Page):
     async def send_data_signup():
         progress_signup_button()
         try:
-            await Api.useractivity(nama_input.value.strip().title(), "Registrasi Akun")
+            await Api.useractivity(nama_input.value.strip().title(), "Signup App")
         except Exception as err:
             DataFormatter.log_msg("Koneksi internet bermasalah", "postuseractivity_error")
             return None
@@ -324,7 +324,7 @@ def signup_view(page: ft.Page):
                         ft.Row(
                             [
                                 ft.Text("Sudah punya akun?", color=ft.Colors.WHITE),
-                                ft.Button(content=ft.Text("Login", color=ft.Colors.BLUE_300), on_click=login_akun)
+                                ft.Button(content=ft.Text("Signin", color=ft.Colors.BLUE_300), on_click=login_akun)
                             ],
                             alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
                             width=310

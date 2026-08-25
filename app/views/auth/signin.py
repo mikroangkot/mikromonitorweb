@@ -77,7 +77,7 @@ def signin_view(page: ft.Page):
     def reset_signin_button():
         signin_button.disabled = False
         signin_button.icon = ft.Icons.FINGERPRINT
-        signin_button.content = ft.Text("Masuk", color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD)
+        signin_button.content = ft.Text("Signin", color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD)
         page.update()
 
     def close_dialog(e):
@@ -143,7 +143,7 @@ def signin_view(page: ft.Page):
                 password_input.value = ""
                 page.navigate("/home")
                 DataFormatter.show_snackbar(page, f"Selamat Datang {username}", "GREEN_900")
-                page.run_task(Api.useractivity, username, "Signin")
+                page.run_task(Api.useractivity, username, "Signin App")
                 return None
             else:
                 DataFormatter.show_snackbar(page, "Username atau Password tidak sesuai...!!!", "YELLOW_900")
@@ -216,7 +216,7 @@ def signin_view(page: ft.Page):
     refresh_captcha_ui()
 
     signin_button = ft.Button(
-        content=ft.Text("Masuk", color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD),
+        content=ft.Text("Signin", color=ft.Colors.WHITE, weight=ft.FontWeight.BOLD),
         width=310,
         height=50,
         bgcolor=ft.Colors.BLUE_600,

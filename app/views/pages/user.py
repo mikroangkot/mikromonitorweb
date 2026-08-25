@@ -4,6 +4,7 @@ import qrcode
 import base64
 import urllib.parse
 from app.helpers.utility import config
+from app.helpers.api import Api
 
 
 def user_view(page: ft.Page):
@@ -79,6 +80,8 @@ def user_view(page: ft.Page):
         ],
         expand=True
     )
+
+    page.run_task(Api.useractivity, user_name, f"View User Account Page")
 
     return ft.Container(
         content=main_layout,

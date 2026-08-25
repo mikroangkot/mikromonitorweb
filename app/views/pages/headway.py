@@ -268,6 +268,8 @@ def headway_view(page: ft.Page):
 		parts = input_value.split("/")
 		dispatcher = parts[0].strip()
 		rute = parts[1].strip()
+		lokasi_awal = dispatcher.split("_")
+		lokasi = lokasi_awal[1].strip()
 		timeout = httpx.Timeout(120.0, connect=10.0)
 		try:
 			async with httpx.AsyncClient(timeout=timeout) as client:
@@ -295,7 +297,7 @@ def headway_view(page: ft.Page):
 							item_box = ft.Column(
 								controls=[
 									ft.Text(f"Tanggal: {DataFormatter.format_tanggal(item.get('start_time'))}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Lokasi: {item.get('dispatcher')}", size=13, color=ft.Colors.WHITE),
+									ft.Text(f"Lokasi: {dispatcher}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"Rute: {rute}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"Odometer: {item.get('busodo')}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"No. Bus: {item.get('bus_code')}", size=13, color=ft.Colors.WHITE),
@@ -309,7 +311,7 @@ def headway_view(page: ft.Page):
 							)
 							daftar_konten.controls.append(item_box)
 						btn_share.visible = True
-						page.run_task(Api.useractivity, username, f"Headway Rute {rute} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
+						page.run_task(Api.useractivity, username, f"View Headway Rute {rute}-{lokasi} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
 					else:
 						DataFormatter.show_snackbar(page, "Data tidak ditemukan...!!!", "YELLOW_900")
 						return None
