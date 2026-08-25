@@ -43,8 +43,8 @@ def build_excel(data_headway, rute):
 		ws.append(
 			[
 				DataFormatter.format_tanggal(item.get("start_time")),
-				item.get("dispatcher"),
-				rute,
+				DataFormatter.format_lokasi(item.get("dispatcher")),
+				DataFormatter.format_rute(rute),
 				item.get("busodo"),
 				buscode,
 				DataFormatter.format_jam(item.get("start_time")),
@@ -297,10 +297,10 @@ def headway_view(page: ft.Page):
 							item_box = ft.Column(
 								controls=[
 									ft.Text(f"Tanggal: {DataFormatter.format_tanggal(item.get('start_time'))}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Lokasi: {dispatcher}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Rute: {rute}", size=13, color=ft.Colors.WHITE),
+									ft.Text(f"Lokasi: {DataFormatter.format_lokasi(dispatcher)}", size=13, color=ft.Colors.WHITE),
+									ft.Text(f"Rute: {DataFormatter.format_rute(rute)}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"Odometer: {item.get('busodo')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"No. Bus: {item.get('bus_code')}", size=13, color=ft.Colors.WHITE),
+									ft.Text(f"No. Bus: {item.get('bus_code').replace('-', ' ')}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"Jam Mulai: {DataFormatter.format_jam(item.get('start_time'))}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"Jam Selesai: {DataFormatter.format_jam(item.get('end_time'))}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"Durasi: {durasi_perjalanan}", size=13, color=ft.Colors.WHITE),
