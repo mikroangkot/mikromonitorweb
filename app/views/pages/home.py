@@ -35,7 +35,7 @@ def home_view(page: ft.Page):
         page.views.clear()
         page.navigate("/loading")
         try:
-            await Api.useractivity(user_name, "Signout")
+            await Api.useractivity(user_name, "Signout App")
         except Exception as err:
             DataFormatter.log_msg("koneksi bermasalah", tag="signout_error")
         page.session.store.remove("current_user")

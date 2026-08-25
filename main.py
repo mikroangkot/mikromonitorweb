@@ -39,7 +39,7 @@ async def main(page: ft.Page):
         page.pop_dialog()
         page.navigate("/loading")
         try:
-            await Api.post_user_activity(user_name, "Signout")
+            await Api.post_user_activity(user_name, "Signout App")
         except Exception as err:
             DataFormatter.log_msg("koneksi internet bermasalah", tag="postuseractivity_error")
         page.session.store.remove("current_user")
