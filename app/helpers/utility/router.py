@@ -51,6 +51,8 @@ class Router:
         is_authenticated = self._is_token_valid(token)
         if token and not is_authenticated:
             await self.storage.remove("token")
+            await self.storage.remove("current_user")
+            page.session.store.remove("current_user")
         server_status = getattr(self.page, "server_status", "open")
         if server_status == "close" and target_route != "/503":
             return await self.page.push_route("/503")
