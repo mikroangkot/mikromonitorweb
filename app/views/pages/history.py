@@ -94,12 +94,12 @@ def history_view(page: ft.Page):
 		btn_share.content = ft.ProgressRing(width=15, height=15, color=ft.Colors.YELLOW_400)
 		page.update()
 		await asyncio.sleep(0.1)
-		default_file_name = f"Data History {search_input.value} {datetime.now().strftime('%Y%m%d')}.xlsx"
+		default_file_name = f"Data History Bus {search_input.value.replace('-', ' ')} {datetime.now().strftime('%Y%m%d')}.xlsx"
 		try:
 			excel_bytes = await asyncio.to_thread(build_excel, state_data["data_history"])
 			excel_file = ft.ShareFile.from_bytes(excel_bytes, name=default_file_name, mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 			await share.share_files([excel_file], text=default_file_name)
-			page.run_task(Api.useractivity, username, f"Share {default_file_name}")
+			page.run_task(Api.useractivity, username, f"Share Data History Bus {search_input.value.replace('-', ' ')} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
 			btn_share.visible = False
 		except Exception as err:
 			DataFormatter.show_snackbar(page, f"Failed Share Data: {err}", "YELLOW_900")

@@ -88,14 +88,16 @@ def headway_view(page: ft.Page):
 		btn_share.content = ft.ProgressRing(width=15, height=15, color=ft.Colors.YELLOW_400)
 		page.update()
 		await asyncio.sleep(0.1)
-		rute = search_input.value.split("/")[1].strip()
-		clean_rute = f"{search_input.value.split('/')[0].strip().replace('_', '')}_{search_input.value.split('/')[1].strip()}"
-		default_file_name = f"Data Headway {clean_rute} {datetime.now().strftime('%Y%m%d')}.xlsx"
+		dispatcher = search_input.value.split("/")
+		rute = dispatcher[1].strip()
+		dispatcher_lokasi = dispatcher[0].split("_")
+		lokasi = dispatcher_lokasi[1].strip()
+		default_file_name = f"Data Headway {DataFormatter.format_rute(rute)} Lokasi {lokasi} {datetime.now().strftime('%Y%m%d')}.xlsx"
 		try:
 			excel_bytes = await asyncio.to_thread(build_excel, state_data["data_headway"], rute)
 			excel_file = ft.ShareFile.from_bytes(excel_bytes, name=default_file_name, mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 			await share.share_files([excel_file], text=default_file_name)
-			page.run_task(Api.useractivity, username, f"Share {default_file_name}")
+			page.run_task(Api.useractivity, username, f"Share Data Headway {DataFormatter.format_rute(rute)} Lokasi {lokasi} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
 			btn_share.visible = False
 		except Exception as err:
 			DataFormatter.show_snackbar(page, f"Failed Share Data: {err}", "YELLOW_900")

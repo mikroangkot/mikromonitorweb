@@ -68,7 +68,7 @@ def kmbaku_view(page: ft.Page):
 			excel_bytes = await asyncio.to_thread(build_excel, state_data["data_kmbaku"])
 			excel_file = ft.ShareFile.from_bytes(excel_bytes, name=default_file_name, mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 			await share.share_files([excel_file], text=default_file_name)
-			page.run_task(Api.useractivity, username, f"Share {default_file_name}")
+			page.run_task(Api.useractivity, username, f"Share Data KM Baku {search_input.value}")
 			btn_share.visible = False
 		except Exception as err:
 			DataFormatter.show_snackbar(page, f"Failed Share Data: {err}", "YELLOW_900")
