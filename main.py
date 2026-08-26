@@ -2,7 +2,7 @@ import flet as ft
 import flet_geolocator as ftg
 from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
-from app.views.pages import home
+from app.views.pages import Pages
 from app.helpers.utility import state, location, init_db, router, info_server, config
 from app.views.auth import (
     signin,
@@ -70,7 +70,7 @@ async def main(page: ft.Page):
         page.show_dialog(dialog_exit)
 
     def build_home_view(p: ft.Page):
-        h_view = home.home_view(p)
+        h_view = Pages.home_view(p)
         h_view.can_pop = False
         h_view.on_confirm_pop = confirm_exit_log
         return h_view
