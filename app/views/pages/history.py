@@ -9,7 +9,7 @@ from app.helpers.utility import config
 from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
 
-def build_excel(data_history):
+def build_excel(data_history, list_dataunit):
 	wb = openpyxl.Workbook()
 	ws = wb.active
 	ws.title = "Data"
@@ -18,6 +18,7 @@ def build_excel(data_history):
 		"ID Order",
 		"Pramudi",
 		"Lokasi",
+		"TNKB",
 		"Rute",
 		"No. Bus",
 		"Jam Mulai",
@@ -36,20 +37,26 @@ def build_excel(data_history):
 		cell = ws.cell(row=1, column=col_num)
 		cell.font = font_header
 		cell.fill = fill_header
+	unit_map = {unit.get("no_body"): unit for unit in list_dataunit if unit.get("no_body")}
 	for index, item in enumerate(data_history):
+		buscode = item.get("bus_code", "")
+		formatted_buscode = buscode.replace("-", " ") if buscode else ""
+		detail_unit = unit_map.get(formatted_buscode, {})
+		rute_unit = detail_unit.get("rute")
+		tnkb_unit = detail_unit.get("tnkb")
 		pramudi = str(item.get("driver_id")).replace(",", " - ").upper()
 		trip_name = str(item.get("trip_desc")).replace(">>", "-").replace(">", "-")
 		nama_petugas = f"{item.get('nama')} - [{item.get('updateby')}]".upper()
 		durasi_perjalanan = DataFormatter.hitung_durasi(item.get("start_time"), item.get("end_time"))
-		buscode = str(item.get("bus_code", "")).replace("-", " ").strip().upper()
 		ws.append(
 			[
 				DataFormatter.format_tanggal(item.get("start_time")),
 				item.get("do_id"),
 				pramudi,
 				DataFormatter.format_lokasi(item.get("dispatcher")),
-				DataFormatter.format_rute(item.get("koridor")),
-				buscode,
+				tnkb_unit,
+				rute_unit,
+				formatted_buscode,
 				DataFormatter.format_jam(item.get("start_time")),
 				DataFormatter.format_jam(item.get("end_time")),
 				durasi_perjalanan,
@@ -67,7 +74,7 @@ def build_excel(data_history):
 		max_len = max(len(str(cell.value or "")) for cell in col)
 		col_letter = openpyxl.utils.get_column_letter(col[0].column)
 		ws.column_dimensions[col_letter].width = max(max_len + 3, 12)
-		if col_letter in ["A", "G", "H", "I"]:
+		if col_letter in ["A", "H", "I", "J"]:
 			for cell in col[1:]:
 				cell.alignment = align_center_data
 	excel_stream = io.BytesIO()
@@ -78,7 +85,7 @@ def build_excel(data_history):
 def history_view(page: ft.Page):
 	profile = page.session.store.get("current_user")
 	username = profile.get("nama", "-")
-	state_data = {"data_history": []}
+	state_data = {"data_history": [], "list_dataunit": []}
 	status_text = ft.Text(value="")
 	rekapan = ft.Container(content=ft.Row(controls=[status_text]))
 	daftar_konten = ft.ListView(spacing=1, padding=1, expand=True)
@@ -97,7 +104,7 @@ def history_view(page: ft.Page):
 		await asyncio.sleep(0.1)
 		default_file_name = f"Data History Bus {search_input.value.replace('-', ' ')} {datetime.now().strftime('%Y%m%d')}.xlsx"
 		try:
-			excel_bytes = await asyncio.to_thread(build_excel, state_data["data_history"])
+			excel_bytes = await asyncio.to_thread(build_excel, state_data["data_history"], state_data["list_dataunit"])
 			excel_file = ft.ShareFile.from_bytes(excel_bytes, name=default_file_name, mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 			await share.share_files([excel_file], text=default_file_name)
 			page.run_task(Api.useractivity, username, f"Share Data History Bus {search_input.value.replace('-', ' ')} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
@@ -280,9 +287,17 @@ def history_view(page: ft.Page):
 					result = response.json()
 					if result.get("success") == 1 and result.get("getdata"):
 						state_data["data_history"] = result["getdata"]
+						list_dataunit = await storage.get("dataunit") or []
+						state_data["list_dataunit"] = list_dataunit
+						unit_map = {unit.get("no_body"): unit for unit in list_dataunit if unit.get("no_body")}
 						total_trip = 0
 						total_kmtempuh = 0.0
 						for item in result["getdata"]:
+							buscode = item.get("bus_code")
+							formatted_buscode = buscode.replace("-", " ") if buscode else ""
+							detail_unit = unit_map.get(formatted_buscode, {})
+							rute_unit = detail_unit.get("rute", "-")
+							tnkb_unit = detail_unit.get("tnkb", "-")
 							durasi_perjalanan = DataFormatter.hitung_durasi(item.get("start_time"), item.get("end_time"))
 							kmbaku = item.get("kmisi")
 							try:
@@ -305,7 +320,8 @@ def history_view(page: ft.Page):
 									ft.Text(f"ID Order: {item.get('do_id')}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"Pramudi: {pramudi}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"Lokasi: {DataFormatter.format_lokasi(item.get('dispatcher'))}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Rute: {DataFormatter.format_rute(item.get('koridor'))}", size=13, color=ft.Colors.WHITE),
+									ft.Text(f"TNKB: {tnkb_unit}", size=13, color=ft.Colors.WHITE),
+									ft.Text(f"Rute: {rute_unit}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"No. Bus: {item.get('bus_code').replace('-', ' ')}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"Jam Mulai: {DataFormatter.format_jam(item.get('start_time'))}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"Jam Selesai: {DataFormatter.format_jam(item.get('end_time'))}", size=13, color=ft.Colors.WHITE),

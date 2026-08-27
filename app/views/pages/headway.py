@@ -9,13 +9,14 @@ from app.helpers.utility import config
 from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
 
-def build_excel(data_headway, rute):
+def build_excel(data_headway, list_dataunit, rute):
 	wb = openpyxl.Workbook()
 	ws = wb.active
 	ws.title = "Data"
 	headers = [
 		"Tanggal",
 		"Lokasi",
+		"TNKB",
 		"Rute",
 		"Odometer",
 		"No. Bus",
@@ -33,20 +34,26 @@ def build_excel(data_headway, rute):
 		cell.font = font_header
 		cell.fill = fill_header
 	total_data = len(data_headway)
+	unit_map = {unit.get("no_body"): unit for unit in list_dataunit if unit.get("no_body")}
 	for index, item in enumerate(data_headway):
+		buscode = item.get("bus_code", "")
+		formatted_buscode = buscode.replace("-", " ") if buscode else ""
+		detail_unit = unit_map.get(formatted_buscode, {})
+		rute_unit = detail_unit.get("rute")
+		tnkb_unit = detail_unit.get("tnkb")
 		durasi_perjalanan = DataFormatter.hitung_durasi(item.get("start_time"), item.get("end_time"))
 		headway_text = ""
 		if index < total_data - 1:
 			bus_berikutnya = data_headway[index + 1]
 			headway_text = DataFormatter.hitung_durasi(item.get("start_time"), bus_berikutnya.get("start_time"))
-		buscode = item.get("bus_code").replace("-", " ").strip().upper()
 		ws.append(
 			[
 				DataFormatter.format_tanggal(item.get("start_time")),
 				DataFormatter.format_lokasi(item.get("dispatcher")),
-				DataFormatter.format_rute(rute),
+				tnkb_unit,
+				rute_unit,
 				item.get("busodo"),
-				buscode,
+				formatted_buscode,
 				DataFormatter.format_jam(item.get("start_time")),
 				DataFormatter.format_jam(item.get("end_time")),
 				durasi_perjalanan,
@@ -61,7 +68,7 @@ def build_excel(data_headway, rute):
 		max_len = max(len(str(cell.value or "")) for cell in col)
 		col_letter = openpyxl.utils.get_column_letter(col[0].column)
 		ws.column_dimensions[col_letter].width = max(max_len + 3, 12)
-		if col_letter in ["A", "F", "G", "H", "I"]:
+		if col_letter in ["A", "G", "H", "I", "J"]:
 			for cell in col[1:]:
 				cell.alignment = align_center_data
 	excel_stream = io.BytesIO()
@@ -72,7 +79,7 @@ def build_excel(data_headway, rute):
 def headway_view(page: ft.Page):
 	profile = page.session.store.get("current_user")
 	username = profile.get("nama", "-")
-	state_data = {"data_headway": []}
+	state_data = {"data_headway": [], "list_dataunit": []}
 	status_text = ft.Text(value="")
 	rekapan = ft.Container(content=ft.Row(controls=[status_text]))
 	daftar_konten = ft.ListView(spacing=1, padding=1, expand=True)
@@ -95,7 +102,7 @@ def headway_view(page: ft.Page):
 		lokasi = dispatcher_lokasi[1].strip()
 		default_file_name = f"Data Headway {DataFormatter.format_rute(rute)} Lokasi {lokasi} {datetime.now().strftime('%Y%m%d')}.xlsx"
 		try:
-			excel_bytes = await asyncio.to_thread(build_excel, state_data["data_headway"], rute)
+			excel_bytes = await asyncio.to_thread(build_excel, state_data["data_headway"], state_data["list_dataunit"], rute)
 			excel_file = ft.ShareFile.from_bytes(excel_bytes, name=default_file_name, mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 			await share.share_files([excel_file], text=default_file_name)
 			page.run_task(Api.useractivity, username, f"Share Data Headway {DataFormatter.format_rute(rute)} Lokasi {lokasi} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
@@ -294,7 +301,15 @@ def headway_view(page: ft.Page):
 						status_text.value = (f"TOTAL UNIT : {total_unit}    ||    TOTAL DATA : {total_data}")
 						status_text.color = ft.Colors.YELLOW_400
 						status_text.size = 13
+						list_dataunit = await storage.get("dataunit") or []
+						state_data["list_dataunit"] = list_dataunit
+						unit_map = {unit.get("no_body"): unit for unit in list_dataunit if unit.get("no_body")}
 						for index, item in enumerate(result["getdata"]):
+							buscode = item.get("bus_code", "")
+							formatted_buscode = buscode.replace("-", " ") if buscode else ""
+							detail_unit = unit_map.get(formatted_buscode, {})
+							rute_unit = detail_unit.get("rute", "-")
+							tnkb_unit = detail_unit.get("tnkb", "-")
 							durasi_perjalanan = DataFormatter.hitung_durasi(item.get("start_time"), item.get("end_time"))
 							headway_text = "-"
 							if index < total_data - 1:
@@ -304,9 +319,10 @@ def headway_view(page: ft.Page):
 								controls=[
 									ft.Text(f"Tanggal: {DataFormatter.format_tanggal(item.get('start_time'))}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"Lokasi: {DataFormatter.format_lokasi(dispatcher)}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Rute: {DataFormatter.format_rute(rute)}", size=13, color=ft.Colors.WHITE),
+									ft.Text(f"TNKB: {tnkb_unit}", size=13, color=ft.Colors.WHITE),
+									ft.Text(f"Rute: {rute_unit}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"Odometer: {item.get('busodo')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"No. Bus: {item.get('bus_code').replace('-', ' ')}", size=13, color=ft.Colors.WHITE),
+									ft.Text(f"No. Bus: {formatted_buscode}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"Jam Mulai: {DataFormatter.format_jam(item.get('start_time'))}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"Jam Selesai: {DataFormatter.format_jam(item.get('end_time'))}", size=13, color=ft.Colors.WHITE),
 									ft.Text(f"Durasi: {durasi_perjalanan}", size=13, color=ft.Colors.WHITE),
