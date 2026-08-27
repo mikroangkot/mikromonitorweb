@@ -5,7 +5,6 @@ from app.helpers.dataformatter import DataFormatter
 from app.helpers.utility import state
 from app.views.auth import offline, loading
 
-
 async def info_server(page: ft.Page):
     storage = DataFormatter()
     while True:

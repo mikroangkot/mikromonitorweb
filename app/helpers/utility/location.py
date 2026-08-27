@@ -4,7 +4,6 @@ import asyncio
 import httpx
 from app.helpers.dataformatter import DataFormatter
 
-
 async def get_current_location(page: ft.Page, geo: ftg.Geolocator):
     storage = DataFormatter()
     lokasi = {"ip_address": None, "latlong": None}
@@ -40,7 +39,6 @@ async def get_current_location(page: ft.Page, geo: ftg.Geolocator):
             await geo.open_location_settings()
             page.update()
             return None
-
     except Exception as err:
         DataFormatter.show_snackbar(page, f"{err}", "YELLOW_900")
         DataFormatter.log_msg(f"{err}", tag="aplikasi_error")

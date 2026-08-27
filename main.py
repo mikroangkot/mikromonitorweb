@@ -3,16 +3,8 @@ import flet_geolocator as ftg
 from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
 from app.views.pages import Pages
-from app.helpers.utility import state, location, init_db, router, info_server, config
-from app.views.auth import (
-    signin,
-    signup,
-    notfound_404,
-    maintenance_503,
-    loading,
-    offline
-)
-
+from app.helpers.utility import (state, location, init_db, router, info_server, config)
+from app.views.auth import (signin, signup, notfound_404, maintenance_503, loading, offline)
 
 async def main(page: ft.Page):
     page.title = config.APP_NAME
@@ -45,24 +37,13 @@ async def main(page: ft.Page):
         page.session.store.remove("current_user")
         await storage.remove("current_user")
         await storage.remove("token")
+        await storage.remove("dataunit")
         page.navigate("/signin")
 
     dialog_exit = ft.AlertDialog(
-        title=ft.Text(
-            "Confirm",
-            weight=ft.FontWeight.BOLD,
-            size=14,
-            color=ft.Colors.YELLOW_600
-        ),
-        content=ft.Text(
-            "Apakah yakin ingin keluar dari aplikasi?",
-            size=13,
-            color=ft.Colors.WHITE
-        ),
-        actions=[
-            ft.TextButton("Batal", on_click=close_dialog_exit),
-            ft.TextButton("Ya", on_click=confirm_exit)
-        ],
+        title=ft.Text("Confirm", weight=ft.FontWeight.BOLD, size=14, color=ft.Colors.YELLOW_600),
+        content=ft.Text("Apakah yakin ingin keluar dari aplikasi?", size=13, color=ft.Colors.WHITE),
+        actions=[ft.TextButton("Batal", on_click=close_dialog_exit), ft.TextButton("Ya", on_click=confirm_exit)],
         actions_alignment=ft.MainAxisAlignment.END
     )
 

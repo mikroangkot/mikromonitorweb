@@ -1,6 +1,5 @@
 import flet as ft
 
-
 def maintenance_503_view(page: ft.Page):
     main_content = ft.Column(
         alignment=ft.MainAxisAlignment.START,

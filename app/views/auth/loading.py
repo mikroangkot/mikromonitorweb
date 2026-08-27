@@ -2,7 +2,6 @@ import flet as ft
 from app.helpers.utility import connection
 from app.helpers.dataformatter import DataFormatter
 
-
 def loading_view(page: ft.Page):
     status_dot = ft.Container(
         width=13,

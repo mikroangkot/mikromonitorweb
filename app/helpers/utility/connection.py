@@ -2,7 +2,6 @@ import flet as ft
 import asyncio
 import inspect
 
-
 class Connectivity:
 
     def __init__(self, page: ft.Page, on_change=None):

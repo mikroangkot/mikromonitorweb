@@ -1,6 +1,5 @@
 import sqlite3
 
-
 async def init_db():
     with sqlite3.connect("project.db") as conn:
         cursor = conn.cursor()

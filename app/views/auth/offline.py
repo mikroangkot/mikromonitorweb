@@ -2,7 +2,6 @@ import flet as ft
 from app.helpers.dataformatter import DataFormatter
 from app.helpers.utility import connection
 
-
 def offline_view(page: ft.Page, on_retry_click):
     status_dot = ft.Container(
         width=13,

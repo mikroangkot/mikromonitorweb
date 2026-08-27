@@ -5,7 +5,6 @@ from typing import Optional
 from app.helpers.dataformatter import DataFormatter
 from app.helpers.utility.config import config
 
-
 class UserActivity:
 
     DB_NAME = "project.db"
@@ -50,9 +49,7 @@ class UserActivity:
                     if record_id:
                         def _delete_local(rid: int):
                             with sqlite3.connect(cls.DB_NAME) as conn:
-                                conn.execute(
-                                    "DELETE FROM user_activities WHERE id = ?", (rid,)
-                                )
+                                conn.execute("DELETE FROM user_activities WHERE id = ?", (rid,))
                                 conn.commit()
                         await asyncio.to_thread(_delete_local, record_id)
                     return True

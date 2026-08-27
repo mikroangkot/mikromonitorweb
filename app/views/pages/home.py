@@ -4,9 +4,7 @@ from app.helpers.dataformatter import DataFormatter
 from app.helpers.utility import connection, config
 from app.views.pages import Pages
 
-
 def home_view(page: ft.Page):
-
     storage = DataFormatter()
     profile = page.session.store.get("current_user") or {}
     user_name = profile.get("nama", "-")
@@ -41,6 +39,7 @@ def home_view(page: ft.Page):
         page.session.store.remove("current_user")
         await storage.remove("current_user")
         await storage.remove("token")
+        await storage.remove("dataunit")
         page.navigate("/signin")
 
     def open_profile(e):

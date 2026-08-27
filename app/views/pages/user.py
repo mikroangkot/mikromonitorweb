@@ -6,7 +6,6 @@ import urllib.parse
 from app.helpers.utility import config
 from app.helpers.api import Api
 
-
 def user_view(page: ft.Page):
     profile = page.session.store.get("current_user") or {}
     user_name = profile.get("nama", "-")

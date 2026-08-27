@@ -84,6 +84,7 @@ def history_view(page: ft.Page):
 	daftar_konten = ft.ListView(spacing=1, padding=1, expand=True)
 	share = ft.Share()
 	raw_bus_data = []
+	storage = DataFormatter()
 
 	async def share_excel(e):
 		if not state_data["data_history"]:

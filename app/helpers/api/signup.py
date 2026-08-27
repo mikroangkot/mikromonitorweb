@@ -2,7 +2,6 @@ import httpx
 from app.helpers.dataformatter import DataFormatter
 from app.helpers.utility.config import config
 
-
 class SignupApp:
 
     @classmethod

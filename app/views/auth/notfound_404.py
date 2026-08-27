@@ -1,6 +1,5 @@
 import flet as ft
 
-
 def notfound_404_view(page: ft.Page):
     main_content = ft.Column(
         alignment=ft.MainAxisAlignment.START,

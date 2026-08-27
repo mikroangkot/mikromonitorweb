@@ -13,9 +13,7 @@ from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
 from app.helpers.utility import connection, config
 
-
 def signup_view(page: ft.Page):
-
     current_captcha_text = ""
 
     def get_assets_dir() -> Path:
@@ -220,12 +218,7 @@ def signup_view(page: ft.Page):
     )
 
     footer_text = ft.Container(
-        content=ft.Text(
-            "Copyright © 2026 RumahDjigo",
-            size=12,
-            color=ft.Colors.WHITE_70,
-            weight=ft.FontWeight.W_300,
-        ),
+        content=ft.Text("Copyright © 2026 RumahDjigo", size=12, color=ft.Colors.WHITE_70, weight=ft.FontWeight.W_300),
         bottom=0,
         left=0,
         right=0,
