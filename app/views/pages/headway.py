@@ -235,7 +235,7 @@ def headway_view(page: ft.Page):
 
 	btn_share = ft.Button(
 		content=ft.Text("Share Data", size=13),
-		width=310,
+		width=333,
 		style=ft.ButtonStyle(color=ft.Colors.WHITE, bgcolor=ft.Colors.GREEN_600),
 		icon=ft.Icons.SHARE,
 		on_click=share_excel,
