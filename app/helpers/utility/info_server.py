@@ -2,7 +2,7 @@ import flet as ft
 import asyncio
 from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
-from app.helpers.utility import state
+from app.helpers.utility import state, config
 from app.views.auth import offline, loading
 
 async def info_server(page: ft.Page):
@@ -17,16 +17,16 @@ async def info_server(page: ft.Page):
                 message = list_info.get("message")
                 if not info or not message:
                     continue
-                if info == "project_register":
+                if info == f"project{config.APP_VERSION}_register":
                     state.register_status = message
                     page.register_status = message
-                if info == "project_status":
+                if info == f"project{config.APP_VERSION}_status":
                     state.server_status = message
                     page.server_status = message
                     if message == "close":
                         await page.push_route("/503")
                         return None
-                if info == "project" and message:
+                if info == f"project{config.APP_VERSION}" and message:
 
                     async def close_banner(e):
                         page.pop_dialog()
