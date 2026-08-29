@@ -99,9 +99,7 @@ jobs:
         run: |
           echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > release.keystore
           cd build/apk
-
           APKSIGNER_PATH=$(find $ANDROID_HOME/build-tools/ -name apksigner | sort -V | tail -n 1)
-
           for apk in *.apk; do
             echo "Signing $apk menggunakan $APKSIGNER_PATH..."
             $APKSIGNER_PATH sign \
@@ -112,7 +110,6 @@ jobs:
               --out "${apk%.apk}-signed.apk" \
               "$apk"
           done
-          
           rm -f ../../release.keystore
 
       - name: Setup Artifact Directory
@@ -121,7 +118,7 @@ jobs:
           cp build/apk/*arm64-v8a-signed.apk dist_app/
 
       - name: Upload APK Artifact
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v7
         with:
           name: MikroMonitor-v.1.${{ github.run_number }}
           path: dist_app/*.apk
