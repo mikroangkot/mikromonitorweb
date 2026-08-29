@@ -7,8 +7,8 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    env:
-      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+    # env:
+    #   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 
     steps:
       - name: Free Disk Space
@@ -104,7 +104,19 @@ jobs:
           echo "${{ secrets.SIGNING_KEY }}" | base64 --decode > release.keystore
           cd build/apk
 
-          APKSIGNER_PATH=$(find $ANDROID_HOME/build-tools/ -name apksigner | sort -V | tail -n 1)
+          SDK_PATH="${ANDROID_HOME:-/usr/lib/android-sdk}"
+          if [ ! -d "$SDK_PATH" ]; then
+            SDK_PATH="/usr/local/lib/android/sdk"
+          fi
+
+          # APKSIGNER_PATH=$(find $ANDROID_HOME/build-tools/ -name apksigner | sort -V | tail -n 1)
+          APKSIGNER_PATH=$(find "$SDK_PATH/build-tools/" -name apksigner 2>/dev/null | sort -V | tail -n 1)
+
+          if [ -z "$APKSIGNER_PATH" ]; then
+            APKSIGNER_PATH="apksigner"
+          fi
+
+          echo "Menggunakan apksigner di: $APKSIGNER_PATH"
 
           for apk in *.apk; do
             echo "Signing $apk menggunakan $APKSIGNER_PATH..."
