@@ -120,5 +120,5 @@ jobs:
       - name: Upload APK Artifact
         uses: actions/upload-artifact@v7
         with:
-          name: MikroMonitor-v.1.${{ github.run_number }}
+          name: MikroMonitor-v${{ github.run_number }}
           path: dist_app/*.apk
