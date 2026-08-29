@@ -226,7 +226,7 @@ def history_view(page: ft.Page):
 		on_click=search_click
 	)
 
-	search_bar = ft.Container(
+	pencarian = ft.Container(
 		content=ft.Row(
 			controls=[search_input, search_button],
 			alignment=ft.MainAxisAlignment.START,
@@ -307,10 +307,6 @@ def history_view(page: ft.Page):
 							if kmbaku_value > 0:
 								total_trip += 1
 							total_kmtempuh += kmbaku_value
-							status_text.value = (f"TOTAL TRIP : {total_trip}    ||    TOTAL KM TEMPUH : {total_kmtempuh:.1f}")
-							status_text.color = ft.Colors.YELLOW_400
-							status_text.size = 13
-
 							pramudi = str(item.get("driver_id")).replace(",", " - ").upper()
 							trip_name = str(item.get("trip_desc")).replace(">>", "-").replace(">", "-")
 							petugas = f"{item.get('nama')} - [{item.get('updateby')}]"
@@ -335,6 +331,9 @@ def history_view(page: ft.Page):
 								spacing=0.5
 							)
 							daftar_konten.controls.append(item_box)
+						status_text.value = (f"TOTAL TRIP : {total_trip}    ||    TOTAL KM TEMPUH : {total_kmtempuh:.1f}")
+						status_text.color = ft.Colors.YELLOW_400
+						status_text.size = 13
 						btn_share.visible = True
 						page.run_task(Api.useractivity, username, f"View History Bus {item.get('bus_code').replace('-', ' ')} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
 					else:
@@ -357,7 +356,7 @@ def history_view(page: ft.Page):
 		controls=[
 			ft.Column(
 				controls=[
-					search_bar,
+					pencarian,
 					rekapan,
 					ft.Container(content=api_result_container, expand=True),
 					btn_share

@@ -146,7 +146,7 @@ def unit_view(page: ft.Page):
 		on_click=search_click
 	)
 
-	search_bar = ft.Container(
+	pencarian = ft.Container(
 		content=ft.Row(
 			controls=[search_input, search_button],
 			alignment=ft.MainAxisAlignment.START,
@@ -236,7 +236,7 @@ def unit_view(page: ft.Page):
 		controls=[
 			ft.Column(
 				controls=[
-					search_bar,
+					pencarian,
 					rekapan,
 					ft.Container(content=api_result_container, expand=True),
 					btn_share
