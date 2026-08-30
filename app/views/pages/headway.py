@@ -228,7 +228,7 @@ def headway_view(page: ft.Page):
 		content=ft.Row(
 			controls=[search_input, search_button],
 			alignment=ft.MainAxisAlignment.START,
-			vertical_alignment=ft.CrossAxisAlignment.CENTER,
+			vertical_alignment=ft.CrossAxisAlignment.CENTER
 		),
 		margin=ft.Margin(top=-1)
 	)
