@@ -135,8 +135,6 @@ def signin_view(page: ft.Page):
                 username = user_payload.get("nama")
                 await storage.set("current_user", user_payload)
                 await storage.set("token", token)
-                dataunit = await Api.dataunit()
-                await storage.set("dataunit", dataunit)
                 if not page.session.store.contains_key("current_user"):
                     page.session.store.set("current_user", user_payload)
                 email_input.value = ""
