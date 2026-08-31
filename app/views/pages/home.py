@@ -4,7 +4,7 @@ from app.helpers.dataformatter import DataFormatter
 from app.helpers.utility import connection, config
 from app.views.pages import Pages
 
-async def init_dataunit(page: ft.Page):
+async def init_dataunit():
     storage = DataFormatter()
     if not await storage.get("dataunit"):
         dataunit_api = await Api.dataunit()
@@ -13,6 +13,7 @@ async def init_dataunit(page: ft.Page):
         await storage.get("dataunit")
 
 def home_view(page: ft.Page):
+    page.run_task(init_dataunit)
     storage = DataFormatter()
     profile = page.session.store.get("current_user") or {}
     user_name = profile.get("nama", "-")

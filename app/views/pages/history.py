@@ -102,12 +102,12 @@ def history_view(page: ft.Page):
 		btn_share.content = ft.ProgressRing(width=15, height=15, color=ft.Colors.YELLOW_400)
 		page.update()
 		await asyncio.sleep(0.1)
-		default_file_name = f"Data History Bus {search_input.value.replace('-', ' ')} {datetime.now().strftime('%Y%m%d')}.xlsx"
+		default_file_name = f"Data History Bus {pencarian_input.value.replace('-', ' ')} {datetime.now().strftime('%Y%m%d')}.xlsx"
 		try:
 			excel_bytes = await asyncio.to_thread(build_excel, state_data["data_history"], state_data["list_dataunit"])
 			excel_file = ft.ShareFile.from_bytes(excel_bytes, name=default_file_name, mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 			await share.share_files([excel_file], text=default_file_name)
-			page.run_task(Api.useractivity, username, f"Share Data History Bus {search_input.value.replace('-', ' ')} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
+			page.run_task(Api.useractivity, username, f"Share Data History Bus {pencarian_input.value.replace('-', ' ')} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
 			btn_share.visible = False
 		except Exception as err:
 			DataFormatter.show_snackbar(page, f"Failed Share Data: {err}", "YELLOW_900")
@@ -147,18 +147,18 @@ def history_view(page: ft.Page):
 	)
 
 	async def open_search_view(e):
-		if hasattr(search_input, "open_view_async"):
-			await search_input.open_view_async()
+		if hasattr(pencarian_input, "open_view_async"):
+			await pencarian_input.open_view_async()
 		else:
-			await search_input.open_view()
+			await pencarian_input.open_view()
 
 	async def select_bus(e):
 		selected_value = e.control.data
-		search_input.value = selected_value
-		if hasattr(search_input, "close_view_async"):
-			await search_input.close_view_async(selected_value)
+		pencarian_input.value = selected_value
+		if hasattr(pencarian_input, "close_view_async"):
+			await pencarian_input.close_view_async(selected_value)
 		else:
-			await search_input.close_view(selected_value)
+			await pencarian_input.close_view(selected_value)
 		page.update()
 		page.run_task(fetch_history, selected_value)
 
@@ -168,7 +168,7 @@ def history_view(page: ft.Page):
 			if filter_text.upper() in b.upper()
 		] if filter_text else raw_bus_data
 
-		search_input.controls = [
+		pencarian_input.controls = [
 			ft.ListTile(
 				title=ft.Text(buscode),
 				data=buscode,
@@ -179,29 +179,29 @@ def history_view(page: ft.Page):
 	async def handle_change(e):
 		val = e.data.upper() if e.data else ""
 		populate_search_controls(val)
-		search_input.update()
+		pencarian_input.update()
 		if val:
-			if hasattr(search_input, "open_view_async"):
-				await search_input.open_view_async()
+			if hasattr(pencarian_input, "open_view_async"):
+				await pencarian_input.open_view_async()
 			else:
-				await search_input.open_view()
+				await pencarian_input.open_view()
 
 	async def search_click(e):
-		buscode = search_input.value.strip().upper() if search_input.value else ""
+		buscode = pencarian_input.value.strip().upper() if pencarian_input.value else ""
 		if not buscode:
 			page.show_dialog(dialog_popup)
 			status_text.value = ""
 			daftar_konten.controls.clear()
 			page.update()
 			return None
-		if hasattr(search_input, "close_view_async"):
-			await search_input.close_view_async(buscode)
+		if hasattr(pencarian_input, "close_view_async"):
+			await pencarian_input.close_view_async(buscode)
 		else:
-			page.run_task(search_input.close_view, buscode)
+			page.run_task(pencarian_input.close_view, buscode)
 		page.update()
 		page.run_task(fetch_history, buscode)
 
-	search_input = ft.SearchBar(
+	pencarian_input = ft.SearchBar(
 		bar_hint_text="Cari Bus...",
 		view_hint_text="Ketik Kode Bus...",
 		bar_text_style=ft.TextStyle(color=ft.Colors.GREY_400, size=13),
@@ -228,7 +228,7 @@ def history_view(page: ft.Page):
 
 	pencarian = ft.Container(
 		content=ft.Row(
-			controls=[search_input, search_button],
+			controls=[pencarian_input, search_button],
 			alignment=ft.MainAxisAlignment.START,
 			vertical_alignment=ft.CrossAxisAlignment.CENTER
 		),
@@ -261,7 +261,7 @@ def history_view(page: ft.Page):
 							bus_list.append(buscode)
 					raw_bus_data = sorted(list(set(bus_list)), key=str.lower)
 					populate_search_controls()
-					search_input.update()
+					pencarian_input.update()
 					page.update()
 		except Exception as err:
 			DataFormatter.log_msg(err)

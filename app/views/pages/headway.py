@@ -96,7 +96,7 @@ def headway_view(page: ft.Page):
 		btn_share.content = ft.ProgressRing(width=15, height=15, color=ft.Colors.YELLOW_400)
 		page.update()
 		await asyncio.sleep(0.1)
-		dispatcher = search_input.value.split("/")
+		dispatcher = pencarian_input.value.split("/")
 		rute = dispatcher[1].strip()
 		dispatcher_lokasi = dispatcher[0].split("_")
 		lokasi = dispatcher_lokasi[1].strip()
@@ -145,18 +145,18 @@ def headway_view(page: ft.Page):
 	)
 
 	async def open_search_view(e):
-		if hasattr(search_input, "open_view_async"):
-			await search_input.open_view_async()
+		if hasattr(pencarian_input, "open_view_async"):
+			await pencarian_input.open_view_async()
 		else:
-			await search_input.open_view()
+			await pencarian_input.open_view()
 
 	async def select_pengendapan(e):
 		selected_value = e.control.data
-		search_input.value = selected_value
-		if hasattr(search_input, "close_view_async"):
-			await search_input.close_view_async(selected_value)
+		pencarian_input.value = selected_value
+		if hasattr(pencarian_input, "close_view_async"):
+			await pencarian_input.close_view_async(selected_value)
 		else:
-			await search_input.close_view(selected_value)
+			await pencarian_input.close_view(selected_value)
 		page.update()
 		page.run_task(fetch_headway, selected_value)
 
@@ -166,7 +166,7 @@ def headway_view(page: ft.Page):
 			if filter_text.upper() in b.upper()
 		] if filter_text else pengendapan
 
-		search_input.controls = [
+		pencarian_input.controls = [
 			ft.ListTile(
 				title=ft.Text(entry),
 				data=entry,
@@ -177,29 +177,29 @@ def headway_view(page: ft.Page):
 	async def handle_change(e):
 		val = e.data.upper() if e.data else ""
 		populate_search_controls(val)
-		search_input.update()
+		pencarian_input.update()
 		if val:
-			if hasattr(search_input, "open_view_async"):
-				await search_input.open_view_async()
+			if hasattr(pencarian_input, "open_view_async"):
+				await pencarian_input.open_view_async()
 			else:
-				await search_input.open_view()
+				await pencarian_input.open_view()
 
 	async def search_click(e):
-		entry = search_input.value.strip().upper() if search_input.value else ""
+		entry = pencarian_input.value.strip().upper() if pencarian_input.value else ""
 		if not entry:
 			page.show_dialog(dialog_popup)
 			status_text.value = ""
 			daftar_konten.controls.clear()
 			page.update()
 			return None
-		if hasattr(search_input, "close_view_async"):
-			await search_input.close_view_async(entry)
+		if hasattr(pencarian_input, "close_view_async"):
+			await pencarian_input.close_view_async(entry)
 		else:
-			page.run_task(search_input.close_view, entry)
+			page.run_task(pencarian_input.close_view, entry)
 		page.update()
 		page.run_task(fetch_headway, entry)
 
-	search_input = ft.SearchBar(
+	pencarian_input = ft.SearchBar(
 		bar_hint_text="Cari Pengendapan...",
 		view_hint_text="Ketik Lokasi Pengendapan...",
 		bar_text_style=ft.TextStyle(color=ft.Colors.GREY_400, size=13),
@@ -226,7 +226,7 @@ def headway_view(page: ft.Page):
 
 	pencarian = ft.Container(
 		content=ft.Row(
-			controls=[search_input, search_button],
+			controls=[pencarian_input, search_button],
 			alignment=ft.MainAxisAlignment.START,
 			vertical_alignment=ft.CrossAxisAlignment.CENTER
 		),
@@ -259,7 +259,7 @@ def headway_view(page: ft.Page):
 							endapan.append(wilayah)
 					pengendapan = sorted(list(set(endapan)), key=str.lower)
 					populate_search_controls()
-					search_input.update()
+					pencarian_input.update()
 					page.update()
 		except Exception as err:
 			DataFormatter.log_msg(err)
