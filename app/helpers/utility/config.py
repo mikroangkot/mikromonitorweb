@@ -86,22 +86,6 @@ class Config:
         )
     )
 
-    MIKRO_API: str = field(
-        default_factory=lambda: (
-            val[0]
-            if (val := "#TEMPLATE_MIKRO_API#") and isinstance(val, list)
-            else os.getenv("MIKRO_API")
-        )
-    )
-
-    AUTHORIZATION: str = field(
-        default_factory=lambda: (
-            val[0]
-            if (val := "#TEMPLATE_AUTHORIZATION#") and isinstance(val, list)
-            else os.getenv("AUTHORIZATION")
-        )
-    )
-
     HEADERS: ClassVar[dict] = {
         "User-Agent": "Mozilla/5.0 (Linux; Android 11; Pixel 5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Mobile Safari/537.36",
         "Accept": "application/json",

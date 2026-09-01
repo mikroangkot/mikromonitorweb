@@ -53,6 +53,7 @@ def kmbaku_view(page: ft.Page):
 	rekapan = ft.Container(content=ft.Row(controls=[status_text]))
 	daftar_konten = ft.ListView(spacing=1, padding=1, expand=True)
 	share = ft.Share()
+	storage = DataFormatter()
 
 	async def share_excel(e):
 		if not state_data["data_kmbaku"]:
@@ -108,20 +109,20 @@ def kmbaku_view(page: ft.Page):
 	)
 
 	def input_change(e):
-		kode = search_input.value.upper().strip()
-		search_input.value = kode
+		pencarian_input = search_input.value.upper().strip()
+		search_input.value = pencarian_input
 		page.update()
 
 	def search_click(e):
-		kode = search_input.value.strip()
-		if not kode:
+		pencarian_input = search_input.value.strip()
+		if not pencarian_input:
 			page.show_dialog(dialog_popup)
 			status_text.value = ""
 			daftar_konten.controls.clear()
 			page.update()
 			return None
 		page.update()
-		page.run_task(fetch_kmbaku, kode)
+		page.run_task(muat_data, pencarian_input)
 
 	search_input = ft.TextField(
 		label=ft.Text("Rute", size=13),
@@ -161,61 +162,52 @@ def kmbaku_view(page: ft.Page):
 		visible=False
 	)
 
-	async def fetch_kmbaku(kode):
+	async def muat_data(pencarian_input):
 		daftar_konten.controls.clear()
 		status_text.value = ""
 		btn_share.visible = False
 		loading_spinner.visible = True
 		page.update()
-		timeout = httpx.Timeout(120.0, connect=10.0)
-		transport = httpx.AsyncHTTPTransport(retries=3)
 		try:
-			async with httpx.AsyncClient(follow_redirects=True, timeout=timeout, transport=transport) as client:
-				response = await client.post(
-					url=config.MIKRO_API,
-					headers=config.HEADERS,
-					params={"page": "km_baku", "length": "-1", "search[value]": kode, "authorization": config.AUTHORIZATION}
+			result = await storage.get("datakmbaku") or []
+			raw_data = result
+			query = (pencarian_input or "").strip().lower()
+			if query:
+				filtered_data = []
+				for item in raw_data:
+					rute = str(item.get("rute") or "").lower()
+					if query in rute:
+						filtered_data.append(item)
+			else:
+				filtered_data = raw_data
+			state_data["data_kmbaku"] = filtered_data
+			total_data = len(filtered_data)
+			if total_data == 0:
+				DataFormatter.show_snackbar(page, "Data Tidak Ditemukan...", "YELLOW_900")
+				return None
+			for index, item in enumerate(state_data["data_kmbaku"][:50]):
+				item_box = ft.Column(
+					controls=[
+						ft.Text(f"Rute: {item.get('rute')}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"Rute Layanan: {item.get('rute_layanan')}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"Nama Trip: {item.get('trip_name')}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"KM Baku: {item.get('km_baku')}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"Keterangan: {item.get('keterangan')}", size=13, color=ft.Colors.WHITE),
+						ft.Text(
+							spans=[ft.TextSpan("Sumber :"), ft.TextSpan(text=item.get("sumber"), url=item.get("sumber"), style=ft.TextStyle(decoration=ft.TextDecoration.UNDERLINE, color=ft.Colors.BLUE_400))],
+							size=13,
+							color=ft.Colors.WHITE
+						),
+						ft.Divider(thickness=0.5, color=ft.Colors.GREY_600)
+					],
+					spacing=0.5
 				)
-				if response.is_success:
-					result = response.json()
-					if result.get("data"):
-						state_data["data_kmbaku"] = result["data"]
-						status_text.value = (f"HASIL PENCARIAN : {result['recordsFiltered']}")
-						status_text.color = ft.Colors.YELLOW_400
-						status_text.size = 13
-						for item in result["data"]:
-							item_box = ft.Column(
-								controls=[
-									ft.Text(f"Rute: {item.get('rute')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Rute Layanan: {item.get('rute_layanan')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Nama Trip: {item.get('trip_name')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"KM Baku: {item.get('km_baku')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Keterangan: {item.get('keterangan')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(
-										spans=[
-											ft.TextSpan("Sumber :"),
-											ft.TextSpan(
-												text=item.get("sumber"),
-												url=item.get("sumber"),
-												style=ft.TextStyle(decoration=ft.TextDecoration.UNDERLINE, color=ft.Colors.BLUE_400)
-											)
-										],
-										size=13,
-										color=ft.Colors.WHITE
-									),
-									ft.Divider(thickness=0.5, color=ft.Colors.GREY_600)
-								],
-								spacing=0.5
-							)
-							daftar_konten.controls.append(item_box)
-						btn_share.visible = True
-						page.run_task(Api.useractivity, username, f"View KM Baku {kode}")
-					else:
-						DataFormatter.show_snackbar(page, "Data tidak ditemukan...!!!", "YELLOW_900")
-						return None
-				else:
-					DataFormatter.show_snackbar(page, "Gagal mengambil data...!!!", "YELLOW_900")
-					return None
+				daftar_konten.controls.append(item_box)
+			status_text.value = (f"HASIL PENCARIAN : {total_data}")
+			status_text.color = ft.Colors.YELLOW_400
+			status_text.size = 13
+			btn_share.visible = True
+			page.run_task(Api.useractivity, username, f"View KM Baku {pencarian_input}")
 		except httpx.TimeoutException:
 			DataFormatter.show_snackbar(page, "Request timout error", "YELLOW_900")
 			return None

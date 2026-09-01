@@ -125,7 +125,7 @@ def unit_view(page: ft.Page):
 			page.update()
 			return None
 		page.update()
-		page.run_task(fetch_dataunit, pencarian_input)
+		page.run_task(muat_data, pencarian_input)
 
 	search_input = ft.TextField(
 		label=ft.Text("No. Bus / Rute", size=13),
@@ -165,7 +165,7 @@ def unit_view(page: ft.Page):
 		visible=False
 	)
 
-	async def fetch_dataunit(pencarian_input):
+	async def muat_data(pencarian_input):
 		daftar_konten.controls.clear()
 		status_text.value = ""
 		btn_share.visible = False
@@ -194,6 +194,9 @@ def unit_view(page: ft.Page):
 				filtered_data = enriched_raw_data
 			state_data["data_unit"] = filtered_data
 			total_data = len(filtered_data)
+			if total_data == 0:
+				DataFormatter.show_snackbar(page, "Data Tidak Ditemukan...", "YELLOW_900")
+				return None
 			for index, item in enumerate(state_data["data_unit"][:50]):
 				rutelayanan = item.get("rute_layanan_copy", "-")
 				item_box = ft.Column(

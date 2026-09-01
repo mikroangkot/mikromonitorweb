@@ -91,8 +91,6 @@ jobs:
           LIST_BUS: ${{ secrets.LIST_BUS }}
           LOKASI_HEADWAY: ${{ secrets.LOKASI_HEADWAY }}
           HISTORY_HEADWAY: ${{ secrets.HISTORY_HEADWAY }}
-          MIKRO_API: ${{ secrets.MIKRO_API }}
-          AUTHORIZATION: ${{ secrets.AUTHORIZATION }}
 
         run: |
           sed -i "s|\"#TEMPLATE_APP_ENV#\"|[\"${APP_ENV}\"]|g" app/helpers/utility/config.py
@@ -104,8 +102,6 @@ jobs:
           sed -i "s|\"#TEMPLATE_LIST_BUS#\"|[\"${LIST_BUS}\"]|g" app/helpers/utility/config.py
           sed -i "s|\"#TEMPLATE_LOKASI_HEADWAY#\"|[\"${LOKASI_HEADWAY}\"]|g" app/helpers/utility/config.py
           sed -i "s|\"#TEMPLATE_HISTORY_HEADWAY#\"|[\"${HISTORY_HEADWAY}\"]|g" app/helpers/utility/config.py
-          sed -i "s|\"#TEMPLATE_MIKRO_API#\"|[\"${MIKRO_API}\"]|g" app/helpers/utility/config.py
-          sed -i "s|\"#TEMPLATE_AUTHORIZATION#\"|[\"${AUTHORIZATION}\"]|g" app/helpers/utility/config.py
 
           flutter config --no-analytics
           flet build apk \
