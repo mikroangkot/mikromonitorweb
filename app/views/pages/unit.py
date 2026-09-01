@@ -9,7 +9,7 @@ from app.helpers.utility import config
 from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
 
-def build_excel(data_unit):
+def build_excel(data_unit, list_kmbaku):
 	wb = openpyxl.Workbook()
 	ws = wb.active
 	ws.title = "Data"
@@ -22,12 +22,15 @@ def build_excel(data_unit):
 		cell = ws.cell(row=1, column=col_num)
 		cell.font = font_header
 		cell.fill = fill_header
+	km_map = {km.get("rute"): km for km in list_kmbaku if km.get("rute")}
 	for index, item in enumerate(data_unit):
+		detail_km = km_map.get(item.get("rute"), {})
+		rutelayanan = detail_km.get("rute_layanan")
 		ws.append(
 			[
 				item.get("no_body"),
 				item.get("rute"),
-				item.get("rute_layanan"),
+				rutelayanan,
 				item.get("tnkb"),
 				item.get("th_registrasi"),
 				item.get("jenis_kendaraan"),
@@ -69,7 +72,7 @@ def unit_view(page: ft.Page):
 		await asyncio.sleep(0.1)
 		default_file_name = f"Data Unit {search_input.value}.xlsx"
 		try:
-			excel_bytes = await asyncio.to_thread(build_excel, state_data["data_unit"])
+			excel_bytes = await asyncio.to_thread(build_excel, state_data["data_unit"], state_data["data_kmbaku"])
 			excel_file = ft.ShareFile.from_bytes(excel_bytes, name=default_file_name, mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 			await share.share_files([excel_file], text=default_file_name)
 			page.run_task(Api.useractivity, username, f"Share Data Unit {search_input.value}")
@@ -175,6 +178,7 @@ def unit_view(page: ft.Page):
 			result = await storage.get("dataunit") or []
 			raw_data = result
 			list_kmbaku = await storage.get("datakmbaku") or []
+			state_data["data_kmbaku"] = list_kmbaku
 			km_map = {km.get("rute"): km for km in list_kmbaku if km.get("rute")}
 			enriched_raw_data = []
 			for item in raw_data:
