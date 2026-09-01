@@ -51,11 +51,12 @@ def build_excel(data_unit):
 def unit_view(page: ft.Page):
 	profile = page.session.store.get("current_user")
 	username = profile.get("nama", "-")
-	state_data = {"data_unit": []}
+	state_data = {"data_unit": [], "data_kmbaku": []}
 	status_text = ft.Text(value="")
 	rekapan = ft.Container(content=ft.Row(controls=[status_text]))
 	daftar_konten = ft.ListView(spacing=1, padding=1, expand=True)
 	share = ft.Share()
+	storage = DataFormatter()
 
 	async def share_excel(e):
 		if not state_data["data_unit"]:
@@ -111,20 +112,20 @@ def unit_view(page: ft.Page):
 	)
 
 	def input_change(e):
-		kode = search_input.value.upper()
-		search_input.value = kode
+		pencarian_input = search_input.value.upper()
+		search_input.value = pencarian_input
 		page.update()
 
 	def search_click(e):
-		kode = search_input.value.strip()
-		if not kode:
+		pencarian_input = search_input.value.strip()
+		if not pencarian_input:
 			page.show_dialog(dialog_popup)
 			status_text.value = ""
 			daftar_konten.controls.clear()
 			page.update()
 			return None
 		page.update()
-		page.run_task(fetch_dataunit, kode)
+		page.run_task(fetch_dataunit, pencarian_input)
 
 	search_input = ft.TextField(
 		label=ft.Text("No. Bus / Rute", size=13),
@@ -164,64 +165,62 @@ def unit_view(page: ft.Page):
 		visible=False
 	)
 
-	async def fetch_dataunit(kode):
+	async def fetch_dataunit(pencarian_input):
 		daftar_konten.controls.clear()
 		status_text.value = ""
 		btn_share.visible = False
 		loading_spinner.visible = True
 		page.update()
-		timeout = httpx.Timeout(120.0, connect=10.0)
-		transport = httpx.AsyncHTTPTransport(retries=3)
 		try:
-			async with httpx.AsyncClient(follow_redirects=True, timeout=timeout, transport=transport) as client:
-				response = await client.post(
-					url=config.MIKRO_API,
-					headers=config.HEADERS,
-					params={"page": "data_unit", "length": "-1", "search[value]": kode, "authorization": config.AUTHORIZATION}
+			result = await storage.get("dataunit") or []
+			raw_data = result
+			list_kmbaku = await storage.get("datakmbaku") or []
+			km_map = {km.get("rute"): km for km in list_kmbaku if km.get("rute")}
+			enriched_raw_data = []
+			for item in raw_data:
+				item_copy = dict(item)
+				detail_km = km_map.get(item.get("rute"), {})
+				item_copy["rute_layanan_copy"] = detail_km.get("rute_layanan")
+				enriched_raw_data.append(item_copy)
+			query = (pencarian_input or "").strip().lower()
+			if query:
+				filtered_data = []
+				for item in enriched_raw_data:
+					rute = str(item.get("rute") or "").lower()
+					no_body = str(item.get("no_body") or "").lower()
+					if query in rute or query in no_body:
+						filtered_data.append(item)
+			else:
+				filtered_data = enriched_raw_data
+			state_data["data_unit"] = filtered_data
+			total_data = len(filtered_data)
+			for index, item in enumerate(state_data["data_unit"][:50]):
+				rutelayanan = item.get("rute_layanan_copy", "-")
+				item_box = ft.Column(
+					controls=[
+						ft.Text(f"No. Body: {item.get('no_body')}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"Rute: {item.get('rute')}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"Rute Layanan: {rutelayanan}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"TNKB: {item.get('tnkb')}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"TH Registrasi: {item.get('th_registrasi')}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"Jenis Kendaraan: {item.get('jenis_kendaraan')}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"Tahapan: {item.get('tahapan')}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"Kontrak: {item.get('kontrak')}", size=13, color=ft.Colors.WHITE),
+						ft.Text(
+							spans=[ft.TextSpan("Sumber :"), ft.TextSpan(text=item.get("file"), url=item.get("file"), style=ft.TextStyle(decoration=ft.TextDecoration.UNDERLINE, color=ft.Colors.BLUE_400))],
+							size=13,
+							color=ft.Colors.WHITE
+						),
+						ft.Divider(thickness=0.5, color=ft.Colors.GREY_600)
+					],
+					spacing=0.5
 				)
-				if response.is_success:
-					result = response.json()
-					if result.get("data"):
-						state_data["data_unit"] = result["data"]
-						status_text.value = (f"HASIL PENCARIAN : {result['recordsFiltered']}")
-						status_text.color = ft.Colors.YELLOW_400
-						status_text.size = 13
-						for item in result["data"]:
-							item_box = ft.Column(
-								controls=[
-									ft.Text(f"No. Body: {item.get('no_body')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Rute: {item.get('rute')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Rute Layanan: {item.get('rute_layanan')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"TNKB: {item.get('tnkb')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"TH Registrasi: {item.get('th_registrasi')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Jenis Kendaraan: {item.get('jenis_kendaraan')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Tahapan: {item.get('tahapan')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Kontrak: {item.get('kontrak')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(
-										spans=[
-											ft.TextSpan("Sumber :"),
-											ft.TextSpan(
-												text=item.get("file"),
-												url=item.get("file"),
-												style=ft.TextStyle(decoration=ft.TextDecoration.UNDERLINE, color=ft.Colors.BLUE_400)
-											)
-										],
-										size=13,
-										color=ft.Colors.WHITE
-									),
-									ft.Divider(thickness=0.5, color=ft.Colors.GREY_600)
-								],
-								spacing=0.5
-							)
-							daftar_konten.controls.append(item_box)
-						btn_share.visible = True
-						page.run_task(Api.useractivity, username, f"View Data Unit {kode}")
-					else:
-						DataFormatter.show_snackbar(page, "Data tidak ditemukan...!!!", "YELLOW_900")
-						return None
-				else:
-					DataFormatter.show_snackbar(page, "Gagal mengambil data...!!!", "YELLOW_900")
-					return None
+				daftar_konten.controls.append(item_box)
+			status_text.value = (f"HASIL PENCARIAN : {total_data}")
+			status_text.color = ft.Colors.YELLOW_400
+			status_text.size = 13
+			btn_share.visible = True
+			page.run_task(Api.useractivity, username, f"View Data Unit {pencarian_input}")
 		except httpx.TimeoutException:
 			DataFormatter.show_snackbar(page, "Request timout error", "YELLOW_900")
 			return None
