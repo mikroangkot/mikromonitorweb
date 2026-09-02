@@ -38,6 +38,7 @@ async def main(page: ft.Page):
         await storage.remove("current_user")
         await storage.remove("token")
         await storage.remove("dataunit")
+        await storage.remove("datakmbaku")
         page.navigate("/signin")
 
     dialog_exit = ft.AlertDialog(
