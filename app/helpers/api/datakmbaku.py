@@ -20,13 +20,13 @@ class DataKmBaku:
 						result = response.json()
 						return result.get("data", [])
 					else:
-						DataFormatter.log_msg(f"response is not json: {response.text[:100]}", tag="dataunit_error")
+						DataFormatter.log_msg(f"response is not json: {response.text[:100]}", tag="datakmbaku_error")
 						return None
 				else:
-					DataFormatter.log_msg(f"http error: {response.status_code}", tag="dataunit_error")
+					DataFormatter.log_msg(f"http error: {response.status_code}", tag="datakmbaku_error")
 		except httpx.TimeoutException:
-			DataFormatter.log_msg("request timeout", tag="dataunit_error")
+			DataFormatter.log_msg("request timeout", tag="datakmbaku_error")
 			return None
 		except Exception as err:
-			DataFormatter.log_msg(f"internal server error: {err}", tag="dataunit_error")
+			DataFormatter.log_msg(f"internal server error: {err}", tag="datakmbaku_error")
 			return None
