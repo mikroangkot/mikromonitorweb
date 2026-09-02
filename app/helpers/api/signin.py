@@ -13,7 +13,7 @@ class SigninApp:
                 response = await client.post(
                     url=config.API_URL,
                     headers=config.HEADERS,
-                    params={"page": "login"},
+                    params={"page": "signinuser"},
                     json={"email": email, "password": password}
                 )
                 if not response.is_success:

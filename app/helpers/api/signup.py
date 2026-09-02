@@ -8,7 +8,7 @@ class SignupApp:
     async def signup(cls, nama, email, no_telp, password):
         timeout = httpx.Timeout(20.0, connect=10.0)
         transport = httpx.AsyncHTTPTransport(retries=3)
-        query_params = {"page": "daftar"}
+        query_params = {"page": "signupuser"}
         payload = {
             "nama": " ".join(nama.split()).title(),
             "email": email.strip(),
