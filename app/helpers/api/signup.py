@@ -6,17 +6,16 @@ class SignupApp:
 
     @classmethod
     async def signup(cls, nama, email, no_telp, password):
-        hashed_password = DataFormatter.password_encrypt(password)
         timeout = httpx.Timeout(20.0, connect=10.0)
         transport = httpx.AsyncHTTPTransport(retries=3)
-        query_params = {"page": "signup"}
+        query_params = {"page": "daftar"}
         payload = {
             "nama": " ".join(nama.split()).title(),
             "email": email.strip(),
             "no_telp": no_telp.strip(),
             "image": "user.png",
             "role": "user",
-            "password": hashed_password,
+            "password": password,
         }
         try:
             async with httpx.AsyncClient(follow_redirects=True, timeout=timeout, transport=transport) as client:
