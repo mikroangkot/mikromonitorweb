@@ -9,16 +9,12 @@ async def init_dataunit():
     if not await storage.get("dataunit"):
         dataunit_api = await Api.dataunit()
         await storage.set("dataunit", dataunit_api)
-    else:
-        await storage.get("dataunit")
 
 async def init_datakmbaku():
     storage = DataFormatter()
     if not await storage.get("datakmbaku"):
         datakmbaku_api = await Api.datakmbaku()
         await storage.set("datakmbaku", datakmbaku_api)
-    else:
-        await storage.get("datakmbaku")
 
 def home_view(page: ft.Page):
     page.run_task(init_dataunit)
