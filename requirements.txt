@@ -1,6 +1,5 @@
 flet
 flet-geolocator
-flet_wakelock
 pillow
 captcha
 qrcode
