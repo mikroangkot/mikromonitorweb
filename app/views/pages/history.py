@@ -47,6 +47,12 @@ def build_excel(data_history, list_dataunit):
 		pramudi = str(item.get("driver_id")).replace(",", " - ").upper()
 		trip_name = str(item.get("trip_desc")).replace(">>", "-").replace(">", "-")
 		nama_petugas = f"{item.get('nama')} - [{item.get('updateby')}]".upper()
+		try:
+			kmbaku = float(item.get("kmisi", 0))
+			odometer = float(item.get("busodo", 0))
+		except (ValueError, TypeError):
+			kmbaku = 0.0
+			odometer = 0
 		durasi_perjalanan = DataFormatter.hitung_durasi(item.get("start_time"), item.get("end_time"))
 		ws.append(
 			[
@@ -61,11 +67,12 @@ def build_excel(data_history, list_dataunit):
 				DataFormatter.format_jam(item.get("end_time")),
 				durasi_perjalanan,
 				trip_name,
-				item.get("kmisi"),
-				item.get("busodo"),
+				kmbaku,
+				odometer,
 				nama_petugas
 			]
 		)
+		ws.cell(row=ws.max_row, column=12).number_format = "#,##0.####"
 	kolom_terakhir = openpyxl.utils.get_column_letter(len(headers))
 	baris_terakhir = ws.max_row
 	ws.auto_filter.ref = f"A1:{kolom_terakhir}{baris_terakhir}"
