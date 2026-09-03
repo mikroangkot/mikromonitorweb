@@ -1,6 +1,5 @@
 import flet as ft
 import flet_geolocator as ftg
-import flet_wakelock as wakelock
 from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
 from app.views.pages import Pages
@@ -19,7 +18,7 @@ async def main(page: ft.Page):
     page.window_width = 390
     page.window_height = 844
 
-    wakelock.enable()
+    page.keep_screen_on = True
     storage = DataFormatter()
     profile = page.session.store.get("current_user") or {}
     user_name = profile.get("nama", "-")
