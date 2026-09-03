@@ -30,8 +30,6 @@ async def main(page: ft.Page):
             await wakelock.enable()
         except Exception as err:
             DataFormatter.log_msg(err)
-            
-    await wakelock_enable()
     
     def close_dialog_exit(e):
         page.pop_dialog()
@@ -104,5 +102,6 @@ async def main(page: ft.Page):
         await location.get_current_location(page, geo)
 
     await init_cek()
+    await wakelock_enable()
 
 ft.run(main, assets_dir="assets")
