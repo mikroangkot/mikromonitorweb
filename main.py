@@ -18,13 +18,21 @@ async def main(page: ft.Page):
     page.window_width = 390
     page.window_height = 844
 
-    page.keep_screen_on = True
+    wakelock = ft.Wakelock()
     storage = DataFormatter()
     profile = page.session.store.get("current_user") or {}
     user_name = profile.get("nama", "-")
     geo = ftg.Geolocator(configuration=ftg.GeolocatorConfiguration(accuracy=ftg.GeolocatorPositionAccuracy.HIGH))
     app_router = router.Router(page)
 
+    async def wakelock_enable():
+        try:
+            await wakelock.enable()
+        except Exception as err:
+            DataFormatter.log_msg(err)
+            
+    await wakelock_enable()
+    
     def close_dialog_exit(e):
         page.pop_dialog()
 
