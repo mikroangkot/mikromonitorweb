@@ -116,6 +116,7 @@ jobs:
             --android-permissions android.permission.ACCESS_COARSE_LOCATION=true \
             --android-permissions android.permission.ACCESS_BACKGROUND_LOCATION=true \
             --android-permissions android.permission.FOREGROUND_SERVICE_LOCATION=true \
+            --android-permissions android.permission.WAKE_LOCK=true \
             --android-features android.hardware.location.gps=true \
             --permissions location \
             --compile-app \
