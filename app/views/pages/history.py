@@ -338,7 +338,7 @@ def history_view(page: ft.Page):
 								spacing=0.5
 							)
 							daftar_konten.controls.append(item_box)
-						status_text.value = (f"TOTAL TRIP : {total_trip}    ||    TOTAL KM TEMPUH : {total_kmtempuh:.4f}")
+						status_text.value = (f"TOTAL TRIP : {total_trip}    ||    TOTAL KM TEMPUH : {total_kmtempuh: g}")
 						status_text.color = ft.Colors.YELLOW_400
 						status_text.size = 13
 						btn_share.visible = True
