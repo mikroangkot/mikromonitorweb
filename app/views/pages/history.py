@@ -410,7 +410,7 @@ def history_view(page: ft.Page):
 							)
 							daftar_konten.controls.append(item_box)
 						total_trip_val.value = total_trip
-						total_kmtempuh_val.value = f"{total_kmtempuh:.4f}"
+						total_kmtempuh_val.value = f"{round(total_kmtempuh, 4):g}"
 						rekapan.visible = True
 						btn_share.visible = True
 						page.run_task(Api.useractivity, username, f"View History Bus {item.get('bus_code').replace('-', ' ')} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
