@@ -93,8 +93,6 @@ def history_view(page: ft.Page):
 	profile = page.session.store.get("current_user")
 	username = profile.get("nama", "-")
 	state_data = {"data_history": [], "list_dataunit": []}
-	status_text = ft.Text(value="")
-	rekapan = ft.Container(content=ft.Row(controls=[status_text]))
 	daftar_konten = ft.ListView(spacing=1, padding=1, expand=True)
 	share = ft.Share()
 	raw_bus_data = []
@@ -197,7 +195,7 @@ def history_view(page: ft.Page):
 		buscode = pencarian_input.value.strip().upper() if pencarian_input.value else ""
 		if not buscode:
 			page.show_dialog(dialog_popup)
-			status_text.value = ""
+			rekapan.visible = False
 			daftar_konten.controls.clear()
 			page.update()
 			return None
@@ -251,6 +249,79 @@ def history_view(page: ft.Page):
 		visible=False
 	)
 
+	total_trip_val = ft.Text("0", size=15, weight=ft.FontWeight.BOLD, color=ft.Colors.YELLOW_400)
+	total_kmtempuh_val = ft.Text("0", size=15, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_300)
+	rekapan = ft.Container(
+		content=ft.Row(
+			controls=[
+				ft.Container(
+					expand=True,
+					content=ft.Card(
+						content=ft.Container(
+							content=ft.Row(
+								controls=[
+									ft.Container(
+										content=ft.Icon(ft.Icons.DIRECTIONS_BUS, size=25, color=ft.Colors.YELLOW_400),
+										padding=ft.Padding(top=6, bottom=6),
+										border_radius=8
+									),
+									ft.Column(
+										controls=[
+											ft.Text("TOTAL TRIP :", size=13, color=ft.Colors.GREY_400, weight=ft.FontWeight.W_500),
+											total_trip_val
+										],
+										spacing=0,
+										alignment=ft.MainAxisAlignment.CENTER,
+										horizontal_alignment=ft.CrossAxisAlignment.START
+									)
+								],
+								spacing=15,
+								alignment=ft.MainAxisAlignment.START
+							),
+							padding=ft.Padding.symmetric(horizontal=12, vertical=6)
+						),
+						bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+						elevation=2
+					)
+				),
+				ft.Container(
+					expand=True,
+					content=ft.Card(
+						content=ft.Container(
+							content=ft.Row(
+								controls=[
+									ft.Container(
+										content=ft.Icon(ft.Icons.ANALYTICS, size=25, color=ft.Colors.BLUE_300),
+										padding=ft.Padding(top=6, bottom=6),
+										border_radius=8
+									),
+									ft.Column(
+										controls=[
+											ft.Text("KM TEMPUH :", size=13, color=ft.Colors.GREY_400, weight=ft.FontWeight.W_500),
+											total_kmtempuh_val
+										],
+										spacing=0,
+										alignment=ft.MainAxisAlignment.CENTER,
+										horizontal_alignment=ft.CrossAxisAlignment.START
+									)
+								],
+								spacing=15,
+								alignment=ft.MainAxisAlignment.START
+							),
+							padding=ft.Padding.symmetric(horizontal=12, vertical=6)
+						),
+						bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+						elevation=2
+					)
+				)
+			],
+			alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+			spacing=5
+		),
+		margin=ft.Margin(top=-15, bottom=0),
+		visible=False
+	)
+
 	async def cari_bus():
 		nonlocal raw_bus_data
 		try:
@@ -277,7 +348,7 @@ def history_view(page: ft.Page):
 
 	async def fetch_history(buscode):
 		daftar_konten.controls.clear()
-		status_text.value = ""
+		rekapan.visible = False
 		btn_share.visible = False
 		loading_spinner.visible = True
 		page.update()
@@ -338,9 +409,9 @@ def history_view(page: ft.Page):
 								spacing=0.5
 							)
 							daftar_konten.controls.append(item_box)
-						status_text.value = (f"TOTAL TRIP : {total_trip}    ||    TOTAL KM TEMPUH : {total_kmtempuh:g}")
-						status_text.color = ft.Colors.YELLOW_400
-						status_text.size = 13
+						total_trip_val.value = total_trip
+						total_kmtempuh_val.value = f"{total_kmtempuh:.4f}"
+						rekapan.visible = True
 						btn_share.visible = True
 						page.run_task(Api.useractivity, username, f"View History Bus {item.get('bus_code').replace('-', ' ')} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
 					else:

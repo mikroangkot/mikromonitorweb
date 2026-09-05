@@ -80,8 +80,6 @@ def headway_view(page: ft.Page):
 	profile = page.session.store.get("current_user")
 	username = profile.get("nama", "-")
 	state_data = {"data_headway": [], "list_dataunit": []}
-	status_text = ft.Text(value="")
-	rekapan = ft.Container(content=ft.Row(controls=[status_text]))
 	daftar_konten = ft.ListView(spacing=1, padding=1, expand=True)
 	share = ft.Share()
 	pengendapan = []
@@ -188,7 +186,7 @@ def headway_view(page: ft.Page):
 		entry = pencarian_input.value.strip().upper() if pencarian_input.value else ""
 		if not entry:
 			page.show_dialog(dialog_popup)
-			status_text.value = ""
+			rekapan.visible = False
 			daftar_konten.controls.clear()
 			page.update()
 			return None
@@ -242,6 +240,79 @@ def headway_view(page: ft.Page):
 		visible=False
 	)
 
+	total_unit_val = ft.Text("0", size=15, weight=ft.FontWeight.BOLD, color=ft.Colors.YELLOW_400)
+	total_data_val = ft.Text("0", size=15, weight=ft.FontWeight.BOLD, color=ft.Colors.BLUE_300)
+	rekapan = ft.Container(
+		content=ft.Row(
+			controls=[
+				ft.Container(
+					expand=True,
+					content=ft.Card(
+						content=ft.Container(
+							content=ft.Row(
+								controls=[
+									ft.Container(
+										content=ft.Icon(ft.Icons.DIRECTIONS_BUS, size=25, color=ft.Colors.YELLOW_400),
+										padding=ft.Padding(top=6, bottom=6),
+										border_radius=8
+									),
+									ft.Column(
+										controls=[
+											ft.Text("TOTAL UNIT :", size=13, color=ft.Colors.GREY_400, weight=ft.FontWeight.W_500),
+											total_unit_val
+										],
+										spacing=0,
+										alignment=ft.MainAxisAlignment.CENTER,
+										horizontal_alignment=ft.CrossAxisAlignment.START
+									)
+								],
+								spacing=15,
+								alignment=ft.MainAxisAlignment.START
+							),
+							padding=ft.Padding.symmetric(horizontal=12, vertical=6)
+						),
+						bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+						elevation=2
+					)
+				),
+				ft.Container(
+					expand=True,
+					content=ft.Card(
+						content=ft.Container(
+							content=ft.Row(
+								controls=[
+									ft.Container(
+										content=ft.Icon(ft.Icons.ANALYTICS, size=25, color=ft.Colors.BLUE_300),
+										padding=ft.Padding(top=6, bottom=6),
+										border_radius=8
+									),
+									ft.Column(
+										controls=[
+											ft.Text("TOTAL DATA :", size=13, color=ft.Colors.GREY_400, weight=ft.FontWeight.W_500),
+											total_data_val
+										],
+										spacing=0,
+										alignment=ft.MainAxisAlignment.CENTER,
+										horizontal_alignment=ft.CrossAxisAlignment.START
+									)
+								],
+								spacing=15,
+								alignment=ft.MainAxisAlignment.START
+							),
+							padding=ft.Padding.symmetric(horizontal=12, vertical=6)
+						),
+						bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+						elevation=2
+					)
+				)
+			],
+			alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+			spacing=5
+		),
+		margin=ft.Margin(top=-15, bottom=0),
+		visible=False
+	)
+
 	async def fetch_lokasi():
 		nonlocal pengendapan
 		try:
@@ -268,7 +339,7 @@ def headway_view(page: ft.Page):
 
 	async def fetch_headway(input_value: str):
 		daftar_konten.controls.clear()
-		status_text.value = ""
+		rekapan.visible = False
 		btn_share.visible = False
 		loading_spinner.visible = True
 		page.update()
@@ -298,9 +369,9 @@ def headway_view(page: ft.Page):
 						total_data = len(result["getdata"])
 						bus_unik = set(item.get("bus_code") for item in result["getdata"] if item.get("bus_code"))
 						total_unit = len(bus_unik)
-						status_text.value = (f"TOTAL UNIT : {total_unit}    ||    TOTAL DATA : {total_data}")
-						status_text.color = ft.Colors.YELLOW_400
-						status_text.size = 13
+						total_unit_val.value = str(total_unit)
+						total_data_val.value = str(total_data)
+						rekapan.visible = True
 						list_dataunit = await storage.get("dataunit") or []
 						state_data["list_dataunit"] = list_dataunit
 						unit_map = {unit.get("no_body"): unit for unit in list_dataunit if unit.get("no_body")}

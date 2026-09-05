@@ -55,8 +55,6 @@ def unit_view(page: ft.Page):
 	profile = page.session.store.get("current_user")
 	username = profile.get("nama", "-")
 	state_data = {"data_unit": [], "data_kmbaku": []}
-	status_text = ft.Text(value="")
-	rekapan = ft.Container(content=ft.Row(controls=[status_text]))
 	daftar_konten = ft.ListView(spacing=1, padding=1, expand=True)
 	share = ft.Share()
 	storage = DataFormatter()
@@ -123,7 +121,7 @@ def unit_view(page: ft.Page):
 		pencarian_input = search_input.value.strip()
 		if not pencarian_input:
 			page.show_dialog(dialog_popup)
-			status_text.value = ""
+			rekapan.visible = False
 			daftar_konten.controls.clear()
 			page.update()
 			return None
@@ -168,9 +166,51 @@ def unit_view(page: ft.Page):
 		visible=False
 	)
 
+	hasil_pencarian = ft.Text("0", size=15, weight=ft.FontWeight.BOLD, color=ft.Colors.YELLOW_400)
+	rekapan = ft.Container(
+		content=ft.Row(
+			controls=[
+				ft.Container(
+					expand=True,
+					content=ft.Card(
+						content=ft.Container(
+							content=ft.Row(
+								controls=[
+									ft.Container(
+										content=ft.Icon(ft.Icons.SEARCH, size=25, color=ft.Colors.YELLOW_400),
+										padding=ft.Padding(top=6, bottom=6),
+										border_radius=8
+									),
+									ft.Column(
+										controls=[
+											ft.Text("HASIL PENCARIAN :", size=13, color=ft.Colors.GREY_400, weight=ft.FontWeight.W_500),
+											hasil_pencarian
+										],
+										spacing=0,
+										alignment=ft.MainAxisAlignment.CENTER,
+										horizontal_alignment=ft.CrossAxisAlignment.START
+									)
+								],
+								spacing=15,
+								alignment=ft.MainAxisAlignment.START
+							),
+							padding=ft.Padding.symmetric(horizontal=12, vertical=6)
+						),
+						bgcolor=ft.Colors.SURFACE_CONTAINER_HIGHEST,
+						elevation=2
+					)
+				)
+			],
+			alignment=ft.MainAxisAlignment.SPACE_BETWEEN,
+			spacing=5
+		),
+		margin=ft.Margin(top=-15, bottom=0),
+		visible=False
+	)
+
 	async def muat_data(pencarian_input):
 		daftar_konten.controls.clear()
-		status_text.value = ""
+		rekapan.visible = False
 		btn_share.visible = False
 		loading_spinner.visible = True
 		page.update()
@@ -223,9 +263,8 @@ def unit_view(page: ft.Page):
 					spacing=0.5
 				)
 				daftar_konten.controls.append(item_box)
-			status_text.value = (f"HASIL PENCARIAN : {total_data}")
-			status_text.color = ft.Colors.YELLOW_400
-			status_text.size = 13
+			hasil_pencarian.value = total_data
+			rekapan.visible = True
 			btn_share.visible = True
 			page.run_task(Api.useractivity, username, f"View Data Unit {pencarian_input}")
 		except httpx.TimeoutException:
