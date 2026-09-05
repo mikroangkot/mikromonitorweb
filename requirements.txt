@@ -6,3 +6,4 @@ qrcode
 PyJWT
 python-dotenv
 openpyxl
+tenacity
