@@ -238,7 +238,7 @@ def unit_view(page: ft.Page):
 				filtered_data = enriched_raw_data
 			state_data["data_unit"] = filtered_data
 			total_data = f"{len(filtered_data):,}".replace(",", ".")
-			if total_data == 0:
+			if len(filtered_data) == 0:
 				DataFormatter.show_snackbar(page, "Data Tidak Ditemukan...", "YELLOW_900")
 				return None
 			for index, item in enumerate(state_data["data_unit"][:50]):

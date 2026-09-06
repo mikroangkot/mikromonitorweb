@@ -17,16 +17,16 @@ async def info_server(page: ft.Page):
                 message = list_info.get("message")
                 if not info or not message:
                     continue
-                if info == f"project{config.APP_VERSION}_register":
+                if info == "project_register":
                     state.register_status = message
                     page.register_status = message
-                if info == f"project{config.APP_VERSION}_status":
+                if info == "project_status":
                     state.server_status = message
                     page.server_status = message
                     if message == "close":
                         await page.push_route("/503")
                         return None
-                if info == f"project{config.APP_VERSION}" and message:
+                if info == "project" and message:
 
                     async def close_banner(e):
                         page.pop_dialog()

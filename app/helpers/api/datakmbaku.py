@@ -8,7 +8,6 @@ class NonJsonResponseError(Exception):
 
 class DataKmBaku:
 
-	@classmethod
 	@retry(
 		stop=stop_after_attempt(3),
 		wait=wait_exponential(multiplier=1, min=2, max=6),
@@ -16,7 +15,8 @@ class DataKmBaku:
 		reraise=True
 	)
 
-	async def _execute_request(cls, token: str):
+	@staticmethod
+	async def _execute_request(token: str):
 		query_params = {"page": "datakmbaku"}
 		payload = {"token": token}
 		timeout = httpx.Timeout(20.0, connect=10.0)
@@ -32,12 +32,12 @@ class DataKmBaku:
 			except Exception as err:
 				raise NonJsonResponseError(f"failed parse json: {err}")
 
-	@classmethod
-	async def datakmbaku(cls):
+	@staticmethod
+	async def datakmbaku():
 		storage = DataFormatter()
 		try:
 			token = await storage.get("token")
-			result = await cls._execute_request(token)
+			result = await DataKmBaku._execute_request(token)
 			return result.get("data", [])
 		except httpx.TimeoutException:
 			DataFormatter.log_msg("request timeout", tag="datakmbaku_error")

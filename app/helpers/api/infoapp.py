@@ -8,7 +8,6 @@ class NonJsonResponseError(Exception):
 
 class InfoApp:
 
-    @classmethod
     @retry(
         stop=stop_after_attempt(3),
         wait=wait_exponential(multiplier=1, min=2, max=6),
@@ -16,7 +15,8 @@ class InfoApp:
         reraise=True
     )
 
-    async def _execute_request(cls):
+    @staticmethod
+    async def _execute_request():
         query_params = {"page": "infoserver"}
         timeout = httpx.Timeout(20.0, connect=10.0)
         async with httpx.AsyncClient(follow_redirects=True, timeout=timeout) as client:
@@ -31,10 +31,10 @@ class InfoApp:
             except Exception as err:
                 raise NonJsonResponseError(f"failed parse json: {err}")
 
-    @classmethod
-    async def info_app(cls):
+    @staticmethod
+    async def info_app():
         try:
-            result = await cls._execute_request()
+            result = await InfoApp._execute_request()
             return result.get("data", [])
         except httpx.TimeoutException:
             DataFormatter.log_msg("request timeout", tag="infoapp_error")
