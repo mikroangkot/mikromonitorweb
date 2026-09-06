@@ -4,8 +4,8 @@ from app.helpers.utility.config import config
 
 class SignupApp:
 
-    @classmethod
-    async def signup(cls, nama, email, no_telp, password):
+    @staticmethod
+    async def signup(nama, email, no_telp, password):
         timeout = httpx.Timeout(20.0, connect=10.0)
         transport = httpx.AsyncHTTPTransport(retries=3)
         query_params = {"page": "signupuser"}
