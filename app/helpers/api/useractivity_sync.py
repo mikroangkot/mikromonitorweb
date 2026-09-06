@@ -5,7 +5,6 @@ from typing import Dict, Any, List
 from app.helpers.dataformatter import DataFormatter
 from app.helpers.utility.config import config
 
-
 class UserActivitySync:
 
     DB_NAME = "project.db"

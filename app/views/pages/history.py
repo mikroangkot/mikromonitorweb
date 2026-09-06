@@ -8,6 +8,7 @@ from datetime import datetime
 from app.helpers.utility import config
 from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
+from tenacity import AsyncRetrying, retry_if_exception_type, stop_after_attempt, wait_exponential
 
 def build_excel(data_history, list_dataunit):
 	wb = openpyxl.Workbook()
@@ -165,7 +166,7 @@ def history_view(page: ft.Page):
 		else:
 			await pencarian_input.close_view(selected_value)
 		page.update()
-		page.run_task(fetch_history, selected_value)
+		page.run_task(muat_data, selected_value)
 
 	def populate_search_controls(filter_text=""):
 		filtered = [
@@ -204,7 +205,7 @@ def history_view(page: ft.Page):
 		else:
 			page.run_task(pencarian_input.close_view, buscode)
 		page.update()
-		page.run_task(fetch_history, buscode)
+		page.run_task(muat_data, buscode)
 
 	pencarian_input = ft.SearchBar(
 		bar_hint_text="Cari Bus...",
@@ -346,81 +347,89 @@ def history_view(page: ft.Page):
 
 	page.run_task(cari_bus)
 
-	async def fetch_history(buscode):
+	async def muat_data(buscode):
 		daftar_konten.controls.clear()
 		rekapan.visible = False
 		btn_share.visible = False
 		loading_spinner.visible = True
 		page.update()
-		timeout = httpx.Timeout(180.0, connect=10.0)
-		transport = httpx.AsyncHTTPTransport(retries=3)
+		timeout = httpx.Timeout(180.0, connect=5.0)
+		response = None
 		try:
-			async with httpx.AsyncClient(timeout=timeout, transport=transport) as client:
-				response = await client.get(
-					url=config.HISTORY_BUS,
-					headers=config.HEADERS,
-					params={"bus_code": buscode}
-				)
-				if response.is_success:
-					result = response.json()
-					if result.get("success") == 1 and result.get("getdata"):
-						state_data["data_history"] = result["getdata"]
-						list_dataunit = await storage.get("dataunit") or []
-						state_data["list_dataunit"] = list_dataunit
-						unit_map = {unit.get("no_body"): unit for unit in list_dataunit if unit.get("no_body")}
-						total_trip = 0
-						total_kmtempuh = 0.0
-						for item in result["getdata"]:
-							buscode = item.get("bus_code")
-							formatted_buscode = buscode.replace("-", " ") if buscode else ""
-							detail_unit = unit_map.get(formatted_buscode, {})
-							rute_unit = detail_unit.get("rute", "-")
-							tnkb_unit = detail_unit.get("tnkb", "-")
-							durasi_perjalanan = DataFormatter.hitung_durasi(item.get("start_time"), item.get("end_time"))
-							kmbaku = item.get("kmisi")
-							try:
-								kmbaku_value = float(kmbaku)
-							except(ValueError, TypeError):
-								kmbaku_value = 0.0
-							if kmbaku_value > 0:
-								total_trip += 1
-							total_kmtempuh += kmbaku_value
-							pramudi = str(item.get("driver_id")).replace(",", " - ").upper()
-							trip_name = str(item.get("trip_desc")).replace(">>", "-").replace(">", "-")
-							petugas = f"{item.get('nama')} - [{item.get('updateby')}]"
-							item_box = ft.Column(
-								controls=[
-									ft.Text(f"Tanggal: {DataFormatter.format_tanggal(item.get('start_time'))}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"ID Order: {item.get('do_id')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Pramudi: {pramudi}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Lokasi: {DataFormatter.format_lokasi(item.get('dispatcher'))}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"TNKB: {tnkb_unit}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Rute: {rute_unit}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"No. Bus: {item.get('bus_code').replace('-', ' ')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Jam Mulai: {DataFormatter.format_jam(item.get('start_time'))}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Jam Selesai: {DataFormatter.format_jam(item.get('end_time'))}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Durasi: {durasi_perjalanan}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Nama Trip: {trip_name}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"KM Baku: {item.get('kmisi')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Odometer: {item.get('busodo')}", size=13, color=ft.Colors.WHITE),
-									ft.Text(f"Petugas: {petugas}", size=13, color=ft.Colors.WHITE),
-									ft.Divider(thickness=0.5, color=ft.Colors.GREY_600)
-								],
-								spacing=0.5
-							)
-							daftar_konten.controls.append(item_box)
-						total_trip_val.value = total_trip
-						total_kmtempuh_val.value = f"{round(total_kmtempuh, 4):g}"
-						rekapan.visible = True
-						btn_share.visible = True
-						page.run_task(Api.useractivity, username, f"View History Bus {item.get('bus_code').replace('-', ' ')} Periode: {datetime.now().strftime('%d-%m-%Y')} s/d {datetime.now().strftime('%d-%m-%Y')}")
-					else:
-						DataFormatter.show_snackbar(page, "Data tidak ditemukan...!!!", "YELLOW_900")
-						return None
-				else:
-					DataFormatter.show_snackbar(page, "Gagal mengambil data...!!!", "YELLOW_900")
-					return None
-		except httpx.TimeoutException:
+			async for attempt in AsyncRetrying(
+				stop=stop_after_attempt(3),
+				wait=wait_exponential(multiplier=2, min=5, max=20),
+				retry=retry_if_exception_type((httpx.RequestError, httpx.HTTPStatusError)),
+				reraise=True
+			):
+				with attempt:
+					async with httpx.AsyncClient(timeout=timeout) as client:
+						response = await client.get(
+							url=config.HISTORY_BUS,
+							headers=config.HEADERS,
+							params={"bus_code": buscode}
+						)
+						response.raise_for_status()
+			if not response:
+				return None
+			result = response.json()
+			if result.get("success") == 1 and result.get("getdata"):
+				state_data["data_history"] = result["getdata"]
+				list_dataunit = await storage.get("dataunit") or []
+				state_data["list_dataunit"] = list_dataunit
+				unit_map = {unit.get("no_body"): unit for unit in list_dataunit if unit.get("no_body")}
+				total_trip = 0
+				total_kmtempuh = 0.0
+				for item in result["getdata"]:
+					item_buscode = item.get("bus_code")
+					formatted_buscode = item_buscode.replace("-", " ") if item_buscode else ""
+					detail_unit = unit_map.get(formatted_buscode, {})
+					rute_unit = detail_unit.get("rute", "-")
+					tnkb_unit = detail_unit.get("tnkb", "-")
+					durasi_perjalanan = DataFormatter.hitung_durasi(item.get("start_time"), item.get("end_time"))
+					kmbaku = item.get("kmisi")
+					try:
+						kmbaku_value = float(kmbaku)
+					except(ValueError, TypeError):
+						kmbaku_value = 0.0
+					if kmbaku_value > 0:
+						total_trip += 1
+					total_kmtempuh += kmbaku_value
+					pramudi = str(item.get("driver_id")).replace(",", " - ").upper()
+					trip_name = str(item.get("trip_desc")).replace(">>", "-").replace(">", "-")
+					petugas = f"{item.get('nama')} - [{item.get('updateby')}]"
+					item_box = ft.Column(
+						controls=[
+							ft.Text(f"Tanggal: {DataFormatter.format_tanggal(item.get('start_time'))}", size=13, color=ft.Colors.WHITE),
+							ft.Text(f"ID Order: {item.get('do_id')}", size=13, color=ft.Colors.WHITE),
+							ft.Text(f"Pramudi: {pramudi}", size=13, color=ft.Colors.WHITE),
+							ft.Text(f"Lokasi: {DataFormatter.format_lokasi(item.get('dispatcher'))}", size=13, color=ft.Colors.WHITE),
+							ft.Text(f"TNKB: {tnkb_unit}", size=13, color=ft.Colors.WHITE),
+							ft.Text(f"Rute: {rute_unit}", size=13, color=ft.Colors.WHITE),
+							ft.Text(f"No. Bus: {formatted_buscode}", size=13, color=ft.Colors.WHITE),
+							ft.Text(f"Jam Mulai: {DataFormatter.format_jam(item.get('start_time'))}", size=13, color=ft.Colors.WHITE),
+							ft.Text(f"Jam Selesai: {DataFormatter.format_jam(item.get('end_time'))}", size=13, color=ft.Colors.WHITE),
+							ft.Text(f"Durasi: {durasi_perjalanan}", size=13, color=ft.Colors.WHITE),
+							ft.Text(f"Nama Trip: {trip_name}", size=13, color=ft.Colors.WHITE),
+							ft.Text(f"KM Baku: {item.get('kmisi')}", size=13, color=ft.Colors.WHITE),
+							ft.Text(f"Odometer: {item.get('busodo')}", size=13, color=ft.Colors.WHITE),
+							ft.Text(f"Petugas: {petugas}", size=13, color=ft.Colors.WHITE),
+							ft.Divider(thickness=0.5, color=ft.Colors.GREY_600)
+						],
+						spacing=0.5
+					)
+					daftar_konten.controls.append(item_box)
+				total_trip_val.value = total_trip
+				total_kmtempuh_val.value = f"{round(total_kmtempuh, 4):g}"
+				rekapan.visible = True
+				btn_share.visible = True
+				bus_title = buscode.replace("-", " ") if buscode else ""
+				now_str = datetime.now().strftime("%d-%m-%Y")
+				page.run_task(Api.useractivity, username, f"View History Bus {bus_title} Periode: {now_str} s/d {now_str}")
+			else:
+				DataFormatter.show_snackbar(page, "Data tidak ditemukan...!!!", "YELLOW_900")
+				return None
+		except (httpx.RequestError, httpx.HTTPStatusError):
 			DataFormatter.show_snackbar(page, "Request timout error", "YELLOW_900")
 			return None
 		except Exception as err:
