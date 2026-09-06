@@ -4,8 +4,8 @@ from app.helpers.utility.config import config
 
 class SigninApp:
 
-    @classmethod
-    async def signin(cls, email, password):
+    @staticmethod
+    async def signin(email, password):
         try:
             transport = httpx.AsyncHTTPTransport(retries=3)
             timeout = httpx.Timeout(20.0, connect=10.0)
