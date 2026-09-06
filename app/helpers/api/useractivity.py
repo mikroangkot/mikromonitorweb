@@ -9,8 +9,8 @@ class UserActivity:
 
     DB_NAME = "project.db"
 
-    @classmethod
-    async def useractivity(cls, username: str, last_activity: str) -> bool:
+    @staticmethod
+    async def useractivity(username: str, last_activity: str) -> bool:
         storage = DataFormatter()
         lokasi = (await storage.get("current_location")) or {}
         ip_address = lokasi.get("ip_address") or "127.0.0.1"
@@ -25,7 +25,7 @@ class UserActivity:
         }
         def _insert_local() -> Optional[int]:
             try:
-                with sqlite3.connect(cls.DB_NAME) as conn:
+                with sqlite3.connect(UserActivity.DB_NAME) as conn:
                     cursor = conn.cursor()
                     cursor.execute(
                         """
@@ -48,7 +48,7 @@ class UserActivity:
                 if response.is_success:
                     if record_id:
                         def _delete_local(rid: int):
-                            with sqlite3.connect(cls.DB_NAME) as conn:
+                            with sqlite3.connect(UserActivity.DB_NAME) as conn:
                                 conn.execute("DELETE FROM user_activities WHERE id = ?", (rid,))
                                 conn.commit()
                         await asyncio.to_thread(_delete_local, record_id)

@@ -9,11 +9,11 @@ class UserActivitySync:
 
     DB_NAME = "project.db"
 
-    @classmethod
-    async def useractivity_sync(cls) -> dict:
+    @staticmethod
+    async def useractivity_sync() -> dict:
         def _fetch_all_pending() -> List[Dict[str, Any]]:
             try:
-                with sqlite3.connect(cls.DB_NAME) as conn:
+                with sqlite3.connect(UserActivitySync.DB_NAME) as conn:
                     conn.row_factory = sqlite3.Row
                     cursor = conn.cursor()
                     cursor.execute("SELECT id, datetime_created, app_name, username, last_activity, ip_address, lat_long FROM user_activities")
@@ -48,7 +48,7 @@ class UserActivitySync:
         if synced_ids:
             def _delete_batch(ids: list[int]):
                 try:
-                    with sqlite3.connect(cls.DB_NAME) as conn:
+                    with sqlite3.connect(UserActivitySync.DB_NAME) as conn:
                         placeholders = ",".join("?" for _ in ids)
                         conn.execute(f"DELETE FROM user_activities WHERE id IN ({placeholders})", ids,)
                         conn.commit()
