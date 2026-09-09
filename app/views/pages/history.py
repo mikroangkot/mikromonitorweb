@@ -353,7 +353,7 @@ def history_view(page: ft.Page):
 		btn_share.visible = False
 		loading_spinner.visible = True
 		page.update()
-		timeout = httpx.Timeout(35.0, connect=5.0)
+		timeout = httpx.Timeout(60.0, connect=5.0)
 		response = None
 		try:
 			async for attempt in AsyncRetrying(
