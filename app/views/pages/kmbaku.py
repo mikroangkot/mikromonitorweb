@@ -125,8 +125,7 @@ def kmbaku_view(page: ft.Page):
 	search_input = ft.TextField(
 		label=ft.Text("Rute", size=13),
 		text_style=ft.TextStyle(color=ft.Colors.WHITE, size=13),
-		border=ft.InputBorder.NONE,
-		border_color=ft.Colors.GREY_400,
+		border=ft.NoInputBorder(),
 		prefix_icon=ft.Icons.ROUTE,
 		cursor_color=ft.Colors.BLUE_400,
 		autofocus=True,

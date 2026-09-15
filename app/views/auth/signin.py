@@ -159,9 +159,7 @@ def signin_view(page: ft.Page):
     email_input = ft.TextField(
         width=310,
         label="email",
-        border=ft.InputBorder.UNDERLINE,
-        border_color=ft.Colors.WHITE_30,
-        focused_border_color=ft.Colors.BLUE_400,
+        border=ft.UnderlineInputBorder(),
         prefix_icon=ft.Icons.MARK_EMAIL_UNREAD,
         cursor_color=ft.Colors.BLUE_400,
         text_style=ft.TextStyle(color=ft.Colors.WHITE),
@@ -173,9 +171,7 @@ def signin_view(page: ft.Page):
     password_input = ft.TextField(
         width=310,
         label="password",
-        border=ft.InputBorder.UNDERLINE,
-        border_color=ft.Colors.WHITE_30,
-        focused_border_color=ft.Colors.BLUE_400,
+        border=ft.UnderlineInputBorder(),
         prefix_icon=ft.Icons.LOCK_ROUNDED,
         cursor_color=ft.Colors.BLUE_400,
         text_style=ft.TextStyle(color=ft.Colors.WHITE),
@@ -202,9 +198,7 @@ def signin_view(page: ft.Page):
     captcha_input = ft.TextField(
         width=120,
         label="CAPTCHA",
-        border=ft.InputBorder.UNDERLINE,
-        border_color=ft.Colors.WHITE_30,
-        focused_border_color=ft.Colors.BLUE_400,
+        border=ft.UnderlineInputBorder(),
         cursor_color=ft.Colors.BLUE_400,
         text_style=ft.TextStyle(color=ft.Colors.WHITE),
         on_submit=signin_clicked,
