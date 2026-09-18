@@ -185,7 +185,6 @@ def history_view(page: ft.Page):
 	async def handle_change(e):
 		val = e.data.upper() if e.data else ""
 		populate_search_controls(val)
-		pencarian_input.update()
 		if val:
 			if hasattr(pencarian_input, "open_view_async"):
 				await pencarian_input.open_view_async()
