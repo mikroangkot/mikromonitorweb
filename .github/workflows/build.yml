@@ -105,6 +105,7 @@ jobs:
 
           flutter config --no-analytics
           flet build apk \
+            --no-cache \
             --project "Mikro Monitor" \
             --bundle-id "com.rumahdjigo.mikromonitor" \
             --company "RumahDjigo" \
