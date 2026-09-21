@@ -157,7 +157,6 @@ def signup_view(page: ft.Page):
         can_reveal_password=True,
         cursor_color=ft.Colors.BLUE_400,
         text_style=ft.TextStyle(color=ft.Colors.WHITE),
-        keyboard_type=ft.KeyboardType.PHONE,
         on_submit=lambda e: page.run_task(next_focus, e, captcha_input)
     )
 
