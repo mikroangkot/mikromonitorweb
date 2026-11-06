@@ -1,41 +1,41 @@
-import httpx
 from app.helpers.dataformatter import DataFormatter
 from app.helpers.utility.config import config
+from app.helpers.utility.supabase import supabase
 
 class SignupApp:
 
     @staticmethod
     async def signup(nama, email, no_telp, password):
-        timeout = httpx.Timeout(20.0, connect=10.0)
-        transport = httpx.AsyncHTTPTransport(retries=3)
-        query_params = {"page": "signupuser"}
-        payload = {
-            "nama": " ".join(nama.split()).title(),
-            "email": email.strip(),
-            "no_telp": no_telp.strip(),
-            "image": "user.png",
-            "role": "user",
-            "password": password,
-        }
         try:
-            async with httpx.AsyncClient(follow_redirects=True, timeout=timeout, transport=transport) as client:
-                response = await client.post(url=config.API_URL, headers=config.HEADERS, params=query_params, json=payload)
-                response.raise_for_status()
-                result = response.json()
-                return {"status": result.get("status", "success"), "message": result.get("message", "Registrasi Sukses...!!!")}
-        except httpx.HTTPStatusError as err:
-            try:
-                server_message = err.response.json().get("message", err.response.text)
-            except Exception:
-                server_message = (err.response.text or f"HTTP Error {err.response.status_code}")
-            DataFormatter.log_msg(f"server error ({err.response.status_code}): {server_message}", tag="registrasi_error")
-            return {"status": "error", "message": server_message}
-        except httpx.NetworkError as err:
-            DataFormatter.log_msg(f"network error: {err}", tag="registrasi_error")
-            return {"status": "error", "message": "Koneksi internet terputus atau tidak stabil"}
-        except httpx.TimeoutException as err:
-            DataFormatter.log_msg(f"timeout error: {err}", tag="registrasi_error")
-            return {"status": "error", "message": "Waktu koneksi habis. Silakan coba lagi"}
+            cleaned_nama = ' '.join(nama.split()).title()
+            cleaned_email = email.strip()
+            cleaned_phone = no_telp.strip()
+            response = supabase.auth.sign_up({
+                'email': cleaned_email,
+                'password': password,
+                'options': {
+                    'data': {
+                        'nama': cleaned_nama,
+                        'no_telp': cleaned_phone,
+                        'image': 'user.png',
+                        'role': 'user'
+                    }
+                }
+            })
+            if response.user:
+                return {
+                    'status': 'success',
+                    'message': 'Registrasi berhasil, silahkan cek email anda'
+                }
+            else:
+                return {
+                    'status': 'error',
+                    'message': 'Registrasi gagal, silahkan ulangi'
+                }
         except Exception as err:
-            DataFormatter.log_msg(f"unexpected error: {err}", tag="registrasi_error")
-            return {"status": "error", "message": "Terjadi kesalahan tak terduga"}
+            err_message = getattr(err, 'message', str(err))
+            DataFormatter.log_msg(f'Signup error: {err_message}', tag='registrasi_error')
+            return {
+                'status': 'error',
+                'message': err_message
+            }

@@ -1,29 +1,42 @@
-import httpx
 from app.helpers.dataformatter import DataFormatter
 from app.helpers.utility.config import config
+from app.helpers.utility.supabase import supabase
 
 class SigninApp:
 
     @staticmethod
     async def signin(email, password):
         try:
-            transport = httpx.AsyncHTTPTransport(retries=3)
-            timeout = httpx.Timeout(20.0, connect=10.0)
-            async with httpx.AsyncClient(follow_redirects=True, timeout=timeout, transport=transport) as client:
-                response = await client.post(
-                    url=config.API_URL,
-                    headers=config.HEADERS,
-                    params={"page": "signinuser"},
-                    json={"email": email, "password": password}
-                )
-                if not response.is_success:
-                    DataFormatter.log_msg(f"{response.status_code}", tag="signin_error")
-                    return None
-                result = response.json()
-                if result.get("status") != "success":
-                    DataFormatter.log_msg("invalid user", tag="signin_error")
-                    return None
-                return result
+            cleaned_email = email.strip()
+            response = supabase.auth.sign_in_with_password({
+                'email': cleaned_email,
+                'password': password
+            })
+            if response.user and response.session:
+                user_metadata = response.user.user_metadata or {}
+                nama = user_metadata.get('nama', 'user')
+                role = user_metadata.get('role', 'user')
+                return {
+                    'status': 'success',
+                    'message': f'Selamat datang kembali {nama}',
+                    'session': response.session,
+                    'user': response.user,
+                    'role': role
+                }
+            else:
+                DataFormatter.log_msg('Login gagal: session atau user tidak ditemukan', tag='signin_error')
+                return {
+                    'status': 'error',
+                    'message': 'Login gagal: silahkan periksa kembali email dan password anda!'
+                }
         except Exception as err:
-            DataFormatter.log_msg(f"internal server error: {err}", tag="signin_error")
-            raise err
+            err_message = getattr(err, 'message', str(err))
+            DataFormatter.log_msg(f'Signin error: {err_message}', tag='signin_error')
+            if 'Invalid login credentials' in err_message:
+                err_message = 'Email atau password anda salah!'
+            elif 'Email not confirmed' in err_message:
+                err_message = 'Email belum dikonfirmasi, silahkan cek link verifikasi di email anda!'
+            return {
+                'status': 'error',
+                'message': err_message
+            }

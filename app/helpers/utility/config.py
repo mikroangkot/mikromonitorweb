@@ -38,14 +38,6 @@ class Config:
         )
     )
 
-    API_URL: str = field(
-        default_factory=lambda: (
-            val[0]
-            if (val := "#TEMPLATE_API_URL#") and isinstance(val, list)
-            else os.getenv("API_URL")
-        )
-    )
-
     API_CDN: str = field(
         default_factory=lambda: (
             val[0]
@@ -83,6 +75,22 @@ class Config:
             val[0]
             if (val := "#TEMPLATE_HISTORY_HEADWAY#") and isinstance(val, list)
             else os.getenv("HISTORY_HEADWAY")
+        )
+    )
+
+    SUPABASE_URL: str = field(
+        default_factory=lambda: (
+            val[0]
+            if (val := "#TEMPLATE_SUPABASE_URL#") and isinstance(val, list)
+            else os.getenv("SUPABASE_URL")
+        )
+    )
+
+    SUPABASE_KEY: str = field(
+        default_factory=lambda: (
+            val[0]
+            if (val := "#TEMPLATE_SUPABASE_KEY#") and isinstance(val, list)
+            else os.getenv("SUPABASE_KEY")
         )
     )
 

@@ -128,23 +128,28 @@ def signin_view(page: ft.Page):
 
     async def validasi_user():
         try:
-            user_account = await Api.signin(email_input.value, password_input.value)
-            if user_account and user_account.get("token"):
-                token = user_account.get("token")
-                user_payload = DataFormatter.decodetoken(token)
-                username = user_payload.get("nama")
-                await storage.set("current_user", user_payload)
-                await storage.set("token", token)
-                if not page.session.store.contains_key("current_user"):
-                    page.session.store.set("current_user", user_payload)
-                email_input.value = ""
-                password_input.value = ""
-                page.navigate("/home")
-                DataFormatter.show_snackbar(page, f"Selamat Datang {username}", "GREEN_900")
-                page.run_task(Api.useractivity, username, "Signin App")
+            result = await Api.signin(email_input.value, password_input.value)
+            if result and result.get('status') == 'success':
+                session = result.get('session')
+                user = result.get('user')
+                role = result.get('role')
+                username = user.user_metadata.get('nama', 'user') if user.user_metadata else 'user'
+                access_token = session.access_token
+                await storage.set('current_user', user.user_metadata)
+                await storage.set('token', access_token)
+                if not page.session.store.contains_key('current_user'):
+                    page.session.store.set('current_user', user.user_metadata)
+                email_input.value = ''
+                password_input.value = ''
+                page.navigate('/home')
+                DataFormatter.show_snackbar(page, result['message'], 'GREEN_900')
+                try:
+                    page.run_task(Api.useractivity, username, 'Signin App')
+                except Exception:
+                    pass
                 return None
             else:
-                DataFormatter.show_snackbar(page, "Username atau Password tidak sesuai...!!!", "YELLOW_900")
+                DataFormatter.show_snackbar(page, f"{result.get('message', 'Username atau Password tidak sesuai...!!!')}", "YELLOW_900")
                 refresh_captcha_ui()
                 return None
         except Exception as err:

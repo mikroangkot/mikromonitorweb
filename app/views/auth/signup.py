@@ -227,14 +227,14 @@ def signup_view(page: ft.Page):
         result = await Api.signup(
             nama=nama_input.value.strip(),
             email=email_input.value.strip(),
-            no_telp=f"'+62{phone_value}",
+            no_telp=f"+62{phone_value}",
             password=password_input.value
         )
         reset_signup_button()
         if result.get("status") == "success":
             await asyncio.sleep(0.1)
             page.navigate("/signin")
-            DataFormatter.show_snackbar(page, "Registrasi berhasil...!!!", "GREEN_900")
+            DataFormatter.show_snackbar(page, f"{result.get('message', 'Registrasi berhasil...!!!')}", "GREEN_900")
             return None
         elif result.get("status") == "error || 404":
             DataFormatter.show_snackbar(page, f"Registrasi gagal:\nPendaftaran ditutup...!!!", "YELLOW_900")
