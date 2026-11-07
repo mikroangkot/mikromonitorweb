@@ -2,6 +2,7 @@ import flet as ft
 from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
 from app.helpers.utility import connection, config
+from app.helpers.utility.supabase import supabase
 from app.views.pages import Pages
 
 async def init_dataunit():
@@ -48,6 +49,10 @@ def home_view(page: ft.Page):
         page.navigate("/loading")
         try:
             await Api.useractivity(user_name, "Signout App")
+        except Exception as err:
+            DataFormatter.log_msg("koneksi bermasalah", tag="signout_error")
+        try:
+            supabase.auth.sign_out()
         except Exception as err:
             DataFormatter.log_msg("koneksi bermasalah", tag="signout_error")
         page.session.store.remove("current_user")

@@ -4,6 +4,7 @@ from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
 from app.views.pages import Pages
 from app.helpers.utility import (state, location, router, info_server, config)
+from app.helpers.utility.supabase import supabase
 from app.views.auth import (signin, signup, notfound_404, maintenance_503, loading, offline)
 
 async def main(page: ft.Page):
@@ -39,6 +40,10 @@ async def main(page: ft.Page):
         page.navigate("/loading")
         try:
             await Api.post_user_activity(user_name, "Signout App")
+        except Exception as err:
+            DataFormatter.log_msg("koneksi internet bermasalah", tag="postuseractivity_error")
+        try:
+            supabase.auth.sign_out()
         except Exception as err:
             DataFormatter.log_msg("koneksi internet bermasalah", tag="postuseractivity_error")
         page.session.store.remove("current_user")

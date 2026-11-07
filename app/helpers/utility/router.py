@@ -2,6 +2,7 @@ import flet as ft
 from datetime import datetime, timezone
 from app.helpers.dataformatter import DataFormatter
 from typing import Callable, Dict
+from app.helpers.utility.supabase import supabase
 
 
 class RouteGuard:
@@ -50,8 +51,10 @@ class Router:
         token = await self.storage.get("token")
         is_authenticated = self._is_token_valid(token)
         if token and not is_authenticated:
+            supabase.auth.sign_out()
             await self.storage.remove("token")
             await self.storage.remove("current_user")
+            is_authenticated = False
         server_status = getattr(self.page, "server_status", "open")
         if server_status == "close" and target_route != "/503":
             return await self.page.push_route("/503")
