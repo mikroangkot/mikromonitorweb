@@ -231,7 +231,7 @@ def kmbaku_view(page: ft.Page):
 						ft.Text(f"Rute Layanan: {item.get('rute_layanan')}", size=13, color=ft.Colors.WHITE),
 						ft.Text(f"Nama Trip: {item.get('trip_name')}", size=13, color=ft.Colors.WHITE),
 						ft.Text(f"KM Baku: {item.get('km_baku')}", size=13, color=ft.Colors.WHITE),
-						ft.Text(f"Keterangan: {item.get('keterangan')}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"Keterangan: {item.get('keterangan') or ''}", size=13, color=ft.Colors.WHITE),
 						ft.Text(
 							spans=[ft.TextSpan("Sumber :"), ft.TextSpan(text=item.get("sumber"), url=item.get("sumber"), style=ft.TextStyle(decoration=ft.TextDecoration.UNDERLINE, color=ft.Colors.BLUE_400))],
 							size=13,
