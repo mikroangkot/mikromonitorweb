@@ -3,7 +3,7 @@ import flet_geolocator as ftg
 from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
 from app.views.pages import Pages
-from app.helpers.utility import (state, location, init_db, router, info_server, config)
+from app.helpers.utility import (state, location, router, info_server, config)
 from app.views.auth import (signin, signup, notfound_404, maintenance_503, loading, offline)
 
 async def main(page: ft.Page):
