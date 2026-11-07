@@ -97,8 +97,6 @@ async def main(page: ft.Page):
     async def init_cek():
         page.navigate("/loading")
         await info_server.info_server(page)
-        await init_db.init_db()
-        await Api.useractivity_sync()
         await location.get_current_location(page, geo)
 
     await init_cek()
