@@ -214,7 +214,7 @@ def unit_view(page: ft.Page):
 		loading_spinner.visible = True
 		page.update()
 		try:
-			result = await Api.dataunit() or []
+			result = await storage.get("dataunit") or []
 			raw_data = result
 			list_kmbaku = await storage.get("datakmbaku") or []
 			state_data["data_kmbaku"] = list_kmbaku
