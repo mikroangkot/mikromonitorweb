@@ -96,7 +96,7 @@ def signup_view(page: ft.Page):
         elif len(phone_input.value) < 10:
             error_message = "No telpon minimal 10 digit...!!!"
         elif len(password_input.value) < 3:
-            error_message = "Password minimal 3 karakter...!!!"
+            error_message = "Password minimal 6 karakter...!!!"
         if error_message:
             DataFormatter.show_snackbar(page, error_message, "YELLOW_900")
             return None
