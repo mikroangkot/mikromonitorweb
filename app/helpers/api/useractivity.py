@@ -7,18 +7,20 @@ from app.helpers.utility.supabase import supabase
 class UserActivity:
 
     @staticmethod
-    async def useractivity(username: str, last_activity: str) -> bool:
+    async def useractivity(username: str, last_activity: str, email_params: Optional[str] = None) -> bool:
         storage = DataFormatter()
+        profile = (await storage.get("current_user")) or {}
+        email = email_params if email_params else profile.get("email") or "-"
         lokasi = (await storage.get("current_location")) or {}
         ip_address = lokasi.get("ip_address") or "127.0.0.1"
         lat_long = f"https://www.google.com/maps/search/?api=1&query={lokasi.get('latlong') or '0.0,0.0'}"
-        query_params = {"page": "useractivity"}
         payload = {
             "app_name": f"{config.APP_NAME} Versi {config.APP_VERSION}",
             "username": username,
             "last_activity": last_activity,
             "ip_address": ip_address,
             "lat_long": lat_long,
+            "email": email
         }
         def _insert_supabase() -> Optional[dict]:
             try:

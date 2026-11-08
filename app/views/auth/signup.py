@@ -217,7 +217,7 @@ def signup_view(page: ft.Page):
     async def send_data_signup():
         progress_signup_button()
         try:
-            await Api.useractivity(nama_input.value.strip().title(), "Signup App")
+            await Api.useractivity(nama_input.value.strip().title(), "Signup App", email_input.value.strip())
         except Exception as err:
             DataFormatter.log_msg("Koneksi internet bermasalah", "postuseractivity_error")
             return None
