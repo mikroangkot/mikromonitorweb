@@ -16,7 +16,7 @@ class SignupApp:
                 if is_confirmed:
                     return {
                         'status': 'error',
-                        'message': 'Email sudah terdaftar\nSilahkan login...!!!'
+                        'message': 'Akun sudah terdaftar\nSilahkan login...!!!'
                     }
                 else:
                     return {
