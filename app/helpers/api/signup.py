@@ -8,8 +8,21 @@ class SignupApp:
     async def signup(nama, email, no_telp, password):
         try:
             cleaned_nama = ' '.join(nama.split()).title()
-            cleaned_email = email.strip()
+            cleaned_email = email.strip().lower()
             cleaned_phone = no_telp.strip()
+            rpc_res = supabase.rpc('check_email_exists', {'check_email': cleaned_email}).execute()
+            if rpc_res.data and rpc_res.data.get('exists'):
+                is_confirmed = rpc_res.data.get('is_confirmed', False)
+                if is_confirmed:
+                    return {
+                        'status': 'error',
+                        'message': 'Email sudah terdaftar\nSilahkan login...!!!'
+                    }
+                else:
+                    return {
+                        'status': 'error',
+                        'message': 'Email sudah terdaftar\nSilahkan cek email anda untuk konfirmasi...!!!'
+                    }
             response = supabase.auth.sign_up({
                 'email': cleaned_email,
                 'password': password,
@@ -23,28 +36,23 @@ class SignupApp:
                 }
             })
             if response and response.user:
-                if hasattr(response.user, 'identities') and response.user.identities == []:
-                    return {
-                        'status': 'error',
-                        'message': 'Registrasi gagal, email sudah terdaftar'
-                    }
                 return {
                     'status': 'success',
-                    'message': 'Registrasi berhasil, silahkan cek email anda untuk verifikasi'
+                    'message': 'Registrasi berhasil\nSilahkan cek email anda untuk konfirmasi...!!!'
                 }
             else:
                 return {
                     'status': 'error',
-                    'message': 'Registrasi gagal, silahkan ulangi'
+                    'message': 'Registrasi gagal\nSilahkan ulangi...!!!'
                 }
         except Exception as err:
             err_message = getattr(err, 'message', str(err))
-            DataFormatter.log_msg(f'Signup error: {err_message}', tag='registrasi_error')
+            DataFormatter.log_msg(err_message, tag='signup_error')
             if 'already registered' in err_message.lower():
-                user_message = 'Email sudah terdaftar. Silakan login'
+                user_message = 'Email sudah terdaftar\nSilahkan login...!!!'
             else:
-                user_message = err_message
+                user_message = f'Terjadi kesalahan\n{err_message}...!!!'
             return {
                 'status': 'error',
-                'message': err_message
+                'message': user_message
             }

@@ -216,32 +216,38 @@ def signup_view(page: ft.Page):
 
     async def send_data_signup():
         progress_signup_button()
+        await asyncio.sleep(0.1)
         try:
-            await Api.useractivity(nama_input.value.strip().title(), "Signup App", email_input.value.strip())
+            phone_value = phone_input.value.strip()
+            if phone_value.startswith("0"):
+                phone_value = phone_value[1:]
+            result = await Api.signup(
+                nama=nama_input.value.strip(),
+                email=email_input.value.strip(),
+                no_telp=f"+62{phone_value}",
+                password=password_input.value
+            )
+            if result.get("status") == "success":
+                await asyncio.sleep(0.1)
+                page.navigate("/signin")
+                DataFormatter.show_snackbar(page, str(result.get('message')), "GREEN_900")
+                try:
+                    await Api.useractivity(nama_input.value.strip().title(), 'Signup App', email_input.value.strip())
+                except Exception as err:
+                    DataFormatter.log_msg(str(err), tag="useractivity_error")
+                return None
+            elif result.get("status") == "error" or result.get("code") == 404:
+                DataFormatter.show_snackbar(page, str(result.get('message')), "YELLOW_900")
+                return None
+            else:
+                DataFormatter.show_snackbar(page, str(result.get('message')), "YELLOW_900")
+                return None
         except Exception as err:
-            DataFormatter.log_msg("Koneksi internet bermasalah", "postuseractivity_error")
+            DataFormatter.log_msg(str(err), tag="signup_exception")
+            DataFormatter.show_snackbar(page, "Terjadi kesalahan sistem, silakan coba lagi", "YELLOW_900")
             return None
-        phone_value = phone_input.value.strip()
-        if phone_value.startswith("0"):
-            phone_value = phone_value[1:]
-        result = await Api.signup(
-            nama=nama_input.value.strip(),
-            email=email_input.value.strip(),
-            no_telp=f"+62{phone_value}",
-            password=password_input.value
-        )
-        reset_signup_button()
-        if result.get("status") == "success":
-            await asyncio.sleep(0.1)
-            page.navigate("/signin")
-            DataFormatter.show_snackbar(page, f"{result.get('message', 'Registrasi berhasil...!!!')}", "GREEN_900")
-            return None
-        elif result.get("status") == "error || 404":
-            DataFormatter.show_snackbar(page, f"Registrasi gagal:\nPendaftaran ditutup...!!!", "YELLOW_900")
-            return None
-        else:
-            DataFormatter.show_snackbar(page, f"{result.get('message', 'Gagal terhubung ke server.')}", "YELLOW_900")
-            return None
+        finally:
+            reset_signup_button()
 
     async def login_akun(e):
         page.navigate("/signin")
