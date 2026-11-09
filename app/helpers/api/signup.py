@@ -22,10 +22,15 @@ class SignupApp:
                     }
                 }
             })
-            if response.user:
+            if response and response.user:
+                if hasattr(response.user, 'identities') and response.user.identities == []:
+                    return {
+                        'status': 'error',
+                        'message': 'Registrasi gagal, email sudah terdaftar'
+                    }
                 return {
                     'status': 'success',
-                    'message': 'Registrasi berhasil, silahkan cek email anda'
+                    'message': 'Registrasi berhasil, silahkan cek email anda untuk verifikasi'
                 }
             else:
                 return {
@@ -35,6 +40,10 @@ class SignupApp:
         except Exception as err:
             err_message = getattr(err, 'message', str(err))
             DataFormatter.log_msg(f'Signup error: {err_message}', tag='registrasi_error')
+            if 'already registered' in err_message.lower():
+                user_message = 'Email sudah terdaftar. Silakan login'
+            else:
+                user_message = err_message
             return {
                 'status': 'error',
                 'message': err_message
