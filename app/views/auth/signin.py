@@ -5,13 +5,12 @@ import random
 import string
 import base64
 import urllib.parse
-import jwt
 import os
 from pathlib import Path
 from captcha.image import ImageCaptcha
 from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
-from app.helpers.utility import state, connection, config
+from app.helpers.utility import (state, connection, config, datetime_indo)
 
 def signin_view(page: ft.Page):
     storage = DataFormatter()
@@ -132,13 +131,15 @@ def signin_view(page: ft.Page):
             if result and result.get('status') == 'success':
                 session = result.get('session')
                 user = result.get('user')
-                role = result.get('role')
-                username = user.user_metadata.get('nama', 'user') if user.user_metadata else 'user'
+                active = datetime_indo.datetime_indo(user.email_confirmed_at) if user.email_confirmed_at else None
+                metadata = dict(user.user_metadata or {})
+                metadata['active_at'] = active
+                username = metadata.get('user', 'user')
                 access_token = session.access_token
-                await storage.set('current_user', user.user_metadata)
+                await storage.set('current_user', metadata)
                 await storage.set('token', access_token)
                 if not page.session.store.contains_key('current_user'):
-                    page.session.store.set('current_user', user.user_metadata)
+                    page.session.store.set('current_user', metadata)
                 email_input.value = ''
                 password_input.value = ''
                 page.navigate('/home')

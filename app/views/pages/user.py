@@ -12,6 +12,7 @@ def user_view(page: ft.Page):
     user_image = profile.get("image", "-")
     user_email = profile.get("email", "-")
     no_telp = profile.get("no_telp", "-")
+    active = profile.get("active_at", "-")
     url_whatsapp = (f"https://wa.me/{no_telp}?text={urllib.parse.quote(f'Hallo {user_name}...')}")
     qr = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_L, box_size=10, border=2)
     qr.add_data(url_whatsapp if url_whatsapp else "-")
@@ -37,7 +38,7 @@ def user_view(page: ft.Page):
 
     footer_text = ft.Container(
         content=ft.Text(
-            f"Copyright © 2026 RumahDjigo",
+            "Copyright © 2026 RumahDjigo",
             size=12,
             color=ft.Colors.WHITE_70,
             weight=ft.FontWeight.W_300,
@@ -53,7 +54,11 @@ def user_view(page: ft.Page):
         [
             ft.Container(
                 content=ft.Column(
-                    [user_icon, username, ft.Text(value=user_email, size=15), ft.Container(height=10), user_qr_code],
+                    [
+                        user_icon, username, ft.Text(value=user_email, size=15), ft.Container(height=10),
+                        user_qr_code, ft.Container(height=10), ft.Text(value='Data Aktivasi:', size=13),
+                        ft.Text(value=active, size=13)
+                    ],
                     spacing=0,
                     horizontal_alignment=ft.CrossAxisAlignment.CENTER,
                     alignment=ft.MainAxisAlignment.CENTER
@@ -80,7 +85,7 @@ def user_view(page: ft.Page):
         expand=True
     )
 
-    page.run_task(Api.useractivity, user_name, f"View User Account Page")
+    page.run_task(Api.useractivity, user_name, "View User Account Page")
 
     return ft.Container(
         content=main_layout,
