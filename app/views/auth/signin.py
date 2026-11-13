@@ -157,7 +157,7 @@ def signin_view(page: ft.Page):
             DataFormatter.log_msg(f"{err}", tag="signin_error")
             DataFormatter.show_snackbar(
                 # page, "Koneksi internet bermasalah...!!!", "YELLOW_900"
-                page, f'error log:\n{str(err)}'
+                page, f'error:\n{str(err)}', 'YELLOW_900'
             )
             return None
         finally:
