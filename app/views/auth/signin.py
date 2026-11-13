@@ -134,7 +134,6 @@ def signin_view(page: ft.Page):
                 active = datetime_indo.datetime_indo(user.email_confirmed_at) if user.email_confirmed_at else None
                 metadata = dict(user.user_metadata or {})
                 metadata['active_at'] = active
-                username = metadata.get('user', 'user')
                 access_token = session.access_token
                 await storage.set('current_user', metadata)
                 await storage.set('token', access_token)
@@ -144,8 +143,9 @@ def signin_view(page: ft.Page):
                 password_input.value = ''
                 page.navigate('/home')
                 DataFormatter.show_snackbar(page, result['message'], 'GREEN_900')
+                username = page.session.store.get('current_user')
                 try:
-                    page.run_task(Api.useractivity, username, 'Signin App')
+                    page.run_task(Api.useractivity, username.get('nama'), 'Signin App')
                 except Exception:
                     pass
                 return None

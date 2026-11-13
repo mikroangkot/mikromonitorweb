@@ -24,6 +24,7 @@ def home_view(page: ft.Page):
     profile = page.session.store.get("current_user") or {}
     user_name = profile.get("nama", "-")
     user_image = profile.get("image", "-")
+    role = profile.get('role', '-')
 
     status_dot = ft.Container(
         width=13,
@@ -190,6 +191,8 @@ def home_view(page: ft.Page):
             body_content.content = Pages.headway_view(page)
         elif selected_label == "History":
             body_content.content = Pages.history_view(page)
+        elif selected_label == "Users":
+            body_content.content = Pages.usersreport_view(page)
         else:
             body_content.content = ft.Container(
                 content=ft.Text(f"Halaman {selected_label}", size=20),
@@ -205,6 +208,8 @@ def home_view(page: ft.Page):
         ft.NavigationBarDestination(icon=ft.Icons.AV_TIMER, label="Headway"),
         ft.NavigationBarDestination(icon=ft.Icons.HISTORY, label="History")
     ]
+    if role == 'admin':
+        nav_destinations.append(ft.NavigationBarDestination(icon=ft.Icons.MENU_BOOK, label='Users'))
 
     my_navbar = ft.Container(
         content=ft.NavigationBar(
