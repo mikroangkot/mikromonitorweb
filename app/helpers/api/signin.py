@@ -33,7 +33,7 @@ class SigninApp:
             err_message = getattr(err, 'message', str(err))
             DataFormatter.log_msg(f'Signin error: {err_message}', tag='signin_error')
             if 'Invalid login credentials' in err_message:
-                err_message = 'Email atau password anda salah!'
+                err_message = 'Email atau password anda salah...!!!!'
             elif 'Email not confirmed' in err_message:
                 err_message = 'Email belum dikonfirmasi\nsilahkan cek link verifikasi di email anda...!!!'
             return {

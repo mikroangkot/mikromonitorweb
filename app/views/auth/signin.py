@@ -156,7 +156,8 @@ def signin_view(page: ft.Page):
         except Exception as err:
             DataFormatter.log_msg(f"{err}", tag="signin_error")
             DataFormatter.show_snackbar(
-                page, "Koneksi internet bermasalah...!!!", "YELLOW_900"
+                # page, "Koneksi internet bermasalah...!!!", "YELLOW_900"
+                page, f'error log:\n{str(err)}'
             )
             return None
         finally:
