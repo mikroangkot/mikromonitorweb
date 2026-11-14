@@ -96,11 +96,25 @@ def home_view(page: ft.Page):
         padding=0,
         content=ft.Row(
             [
-                ft.Text(
-                    value=user_name,
-                    size=12,
-                    weight=ft.FontWeight.W_500,
-                    color=ft.Colors.WHITE
+                ft.Column(
+                    [
+                        ft.Text(
+                            value=user_name,
+                            size=12,
+                            weight=ft.FontWeight.W_500,
+                            color=ft.Colors.WHITE
+                        ),
+                        ft.Text(
+                            value=profile.get('email'),
+                            size=10,
+                            weight=ft.FontWeight.W_500,
+                            color=ft.Colors.WHITE
+                        )
+                    ],
+                    tight=True,
+                    alignment=ft.MainAxisAlignment.CENTER,
+                    horizontal_alignment=ft.CrossAxisAlignment.CENTER,
+                    spacing=0
                 ),
                 ft.Container(
                     content=ft.Image(

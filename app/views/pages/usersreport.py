@@ -25,7 +25,7 @@ def build_excel(report):
 			[
 				item.get("no"),
 				DataFormatter.format_tanggal_hari(item.get("created_at")),
-				format_jam(item.get("created_at")),
+				DataFormatter.format_jam(item.get("created_at")),
 				item.get("app_name"),
 				item.get("username"),
 				item.get("email"),
