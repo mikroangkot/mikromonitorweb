@@ -9,6 +9,7 @@ from app.views.auth import (signin, signup, notfound_404, maintenance_503, loadi
 
 async def main(page: ft.Page):
     page.title = config.APP_NAME
+    page.window.icon = "icon.ico"
     page.theme_mode = ft.ThemeMode.DARK
     page.fonts = {"Rubrik": "/fonts/Rubrik.otf"}
     page.theme = ft.Theme(font_family="Rubrik")
