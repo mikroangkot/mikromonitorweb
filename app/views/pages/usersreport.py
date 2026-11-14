@@ -6,7 +6,6 @@ import openpyxl
 from openpyxl.styles import Font, PatternFill, Alignment
 from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
-from app.helpers.utility.datetime_indo import format_tanggal_hari, format_jam
 
 def build_excel(report):
 	wb = openpyxl.Workbook()
@@ -25,7 +24,7 @@ def build_excel(report):
 		ws.append(
 			[
 				item.get("no"),
-				format_tanggal_hari(item.get("created_at")),
+				DataFormatter.format_tanggal_hari(item.get("created_at")),
 				format_jam(item.get("created_at")),
 				item.get("app_name"),
 				item.get("username"),
@@ -34,8 +33,8 @@ def build_excel(report):
 				item.get("ip_address"),
 				item.get("lat_long"),
 				item.get("uid"),
-				item.get("last_signin"),
-				item.get("email_confirmed_at")
+				DataFormatter.format_tanggal_komplit(item.get("last_signin")),
+				DataFormatter.format_tanggal_komplit(item.get("email_confirmed_at"))
 			]
 		)
 	kolom_terakhir = openpyxl.utils.get_column_letter(len(headers))
@@ -70,7 +69,7 @@ def usersreport_view(page: ft.Page):
 		await asyncio.sleep(0.1)
 		default_file_name = "Users Report Activity.xlsx"
 		try:
-			excel_bytes = await asyncio.to_thread(build_excel, state_data["report"])
+			excel_bytes = await asyncio.to_thread(build_excel, state_data["report"][:100])
 			excel_file = ft.ShareFile.from_bytes(excel_bytes, name=default_file_name, mime_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
 			await share.share_files([excel_file], text=default_file_name)
 			page.run_task(Api.useractivity, username, f"Share {default_file_name}")
@@ -165,12 +164,12 @@ def usersreport_view(page: ft.Page):
 				item_box = ft.Column(
 					controls=[
 						ft.Text(f"No: {item.get('no')}", size=13, color=ft.Colors.WHITE),
-						ft.Text(f"Hari/Tanggal: {format_tanggal_hari(item.get('created_at'))}", size=13, color=ft.Colors.WHITE),
-						ft.Text(f"Jam: {format_jam(item.get('created_at'))}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"Hari/Tanggal: {DataFormatter.format_tanggal_hari(item.get('created_at'))}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"Jam: {DataFormatter.format_jam(item.get('created_at'))}", size=13, color=ft.Colors.WHITE),
 						ft.Text(f"App Name: {item.get('app_name')}", size=13, color=ft.Colors.WHITE),
 						ft.Text(f"Nama: {item.get('username')}", size=13, color=ft.Colors.WHITE),
 						ft.Text(f"Email: {item.get('email')}", size=13, color=ft.Colors.WHITE),
-						ft.Text(f"Last Activity: {item.get('last_activity').title()}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"Last Activity: {item.get('last_activity')}", size=13, color=ft.Colors.WHITE),
 						ft.Text(f"IP Address: {item.get('ip_address')}", size=13, color=ft.Colors.WHITE),
 						ft.Text(
 							spans=[
@@ -184,8 +183,8 @@ def usersreport_view(page: ft.Page):
 							color=ft.Colors.WHITE
 						),
 						ft.Text(f"User ID: {item.get('uid')}", size=13, color=ft.Colors.WHITE),
-						ft.Text(f"Last Signin: {item.get('last_signin')}", size=13, color=ft.Colors.WHITE),
-						ft.Text(f"Active At: {item.get('email_confirmed_at')}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"Last Signin: {DataFormatter.format_tanggal_komplit(item.get('last_signin'))}", size=13, color=ft.Colors.WHITE),
+						ft.Text(f"Active At: {DataFormatter.format_tanggal_komplit(item.get('email_confirmed_at'))}", size=13, color=ft.Colors.WHITE),
 						ft.Divider(thickness=0.5, color=ft.Colors.GREY_600)
 					],
 					spacing=0.5

@@ -10,7 +10,7 @@ from pathlib import Path
 from captcha.image import ImageCaptcha
 from app.helpers.api import Api
 from app.helpers.dataformatter import DataFormatter
-from app.helpers.utility import (state, connection, config, datetime_indo)
+from app.helpers.utility import (state, connection, config)
 
 def signin_view(page: ft.Page):
     storage = DataFormatter()
@@ -131,7 +131,7 @@ def signin_view(page: ft.Page):
             if result and result.get('status') == 'success':
                 session = result.get('session')
                 user = result.get('user')
-                active = datetime_indo.datetime_indo(user.email_confirmed_at) if user.email_confirmed_at else None
+                active = DataFormatter.datetime_indo(user.email_confirmed_at) if user.email_confirmed_at else None
                 metadata = dict(user.user_metadata or {})
                 metadata['active_at'] = active
                 access_token = session.access_token
